@@ -6,10 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useRoomUiStore } from "@/stores/room-ui-store";
-import type { RealityCheckResult, TranslationMode } from "@/lib/types";
+import type { MessageAnalysis, RealityCheckResult, TranslationMode } from "@/lib/types";
 import { TranslationModeSelector } from "./TranslationModeSelector";
 import { VoiceInputControl, type VoiceInputHandle } from "./VoiceInputControl";
 import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
+
+type PreviewData = {
+  /** The exact raw draft text the preview was computed for. */
+  originalDraft: string;
+  /** Mediator's rewrite (initially). Becomes the editable text. */
+  mediated: string;
+  detectedIntent?: string;
+  escalationRisk?: number;
+  analysis?: MessageAnalysis;
+};
 
 export function PrivateComposer({
   roomId,
@@ -36,6 +46,8 @@ export function PrivateComposer({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reality, setReality] = useState<RealityCheckResult | null>(null);
+  const [preview, setPreview] = useState<PreviewData | null>(null);
+  const [editingPreview, setEditingPreview] = useState(false);
   const voiceRef = useRef<VoiceInputHandle | null>(null);
 
   async function quickRewrite(kind: "clearer" | "gentler" | "deeper") {
@@ -57,14 +69,15 @@ export function PrivateComposer({
     }
   }
 
-  async function send(confirmDespiteReality: boolean) {
+  /**
+   * First phase: ask the server to mediate but NOT persist. Returns the
+   * mediated text + analysis so the sender can review before commit.
+   * Reality-check and safety gates still fire here.
+   */
+  async function requestPreview(confirmDespiteReality: boolean) {
     const text = draft.trim();
     if (!text || busy || disabled || messageBlocked) return;
-    // Optimistic clear + stop voice so late `onresult` events can't write the
-    // sent message back into the box. We restore the draft only if something
-    // goes wrong or the AI wants us to pause (reality check, safety, limit).
     voiceRef.current?.stopAndReset();
-    setDraft("");
     setBusy(true);
     setError(null);
     try {
@@ -77,6 +90,7 @@ export function PrivateComposer({
           translationMode,
           confirmDespiteReality,
           skipRealityCheck: false,
+          preview: true,
         }),
       });
       const data = (await res.json()) as {
@@ -87,36 +101,114 @@ export function PrivateComposer({
         realityCheck?: RealityCheckResult;
         ok?: boolean;
         safety?: { userMessage?: string };
+        preview?: {
+          mediated: string;
+          detectedIntent?: string;
+          escalationRisk?: number;
+          analysis?: MessageAnalysis;
+        };
       };
       if (res.status === 402 && data.code === "MESSAGE_LIMIT") {
         onMessageBlocked?.();
         setError(t.composer.messageBlocked);
-        setDraft(text);
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Could not send.");
 
       if (data.ok === false && data.phase === "safety") {
         setError(data.safety?.userMessage ?? "Safety pause — please revise or seek human support.");
-        setDraft(text);
         return;
       }
 
       if (data.phase === "reality_check" && data.realityCheck) {
-        // Put the draft back so the user can revise it with the reality prompts.
-        setDraft(text);
         setReality(data.realityCheck);
         return;
       }
 
-      setReality(null);
-      await onSent();
+      if (data.phase === "preview" && data.preview) {
+        setReality(null);
+        setPreview({
+          originalDraft: text,
+          mediated: data.preview.mediated,
+          detectedIntent: data.preview.detectedIntent,
+          escalationRisk: data.preview.escalationRisk,
+          analysis: data.preview.analysis,
+        });
+        setEditingPreview(false);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Send failed.");
-      setDraft(text);
     } finally {
       setBusy(false);
     }
+  }
+
+  /**
+   * Second phase: commit the previewed (optionally edited) message OR the
+   * sender's own wording. Safety check still runs server-side on the raw.
+   */
+  async function commit(mode: "mediated" | "mediated_edited" | "sender_original") {
+    if (!preview || busy) return;
+    const raw = preview.originalDraft;
+    const outgoing =
+      mode === "sender_original" ? raw : preview.mediated.trim() || raw;
+
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/rooms/${encodeURIComponent(roomId)}/message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          participantId,
+          content: raw,
+          translationMode,
+          // Reality check already cleared in the preview step. Safety still runs.
+          skipRealityCheck: true,
+          confirmDespiteReality: true,
+          overrideMediated: outgoing,
+          deliveryMode: mode,
+          // Only forward mediator analysis when the user is keeping the mediated
+          // text (possibly with edits). Sending original means no mediator analysis.
+          analysis: mode === "sender_original" ? undefined : preview.analysis,
+          detectedIntent: mode === "sender_original" ? undefined : preview.detectedIntent,
+          escalationRisk: mode === "sender_original" ? undefined : preview.escalationRisk,
+        }),
+      });
+      const data = (await res.json()) as {
+        error?: string;
+        ok?: boolean;
+        phase?: string;
+        safety?: { userMessage?: string };
+      };
+      if (!res.ok) throw new Error(data.error ?? "Could not send.");
+      if (data.ok === false && data.phase === "safety") {
+        setError(data.safety?.userMessage ?? "Safety pause — please revise or seek human support.");
+        return;
+      }
+      setPreview(null);
+      setEditingPreview(false);
+      setDraft("");
+      await onSent();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Send failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function cancelPreview() {
+    setPreview(null);
+    setEditingPreview(false);
+  }
+
+  async function handleSendOriginal() {
+    if (!preview) return;
+    if (typeof window !== "undefined") {
+      const ok = window.confirm(t.composer.sendOriginalConfirm);
+      if (!ok) return;
+    }
+    await commit("sender_original");
   }
 
   return (
@@ -150,18 +242,18 @@ export function PrivateComposer({
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder={t.composer.draftPlaceholder}
-            disabled={busy || disabled || messageBlocked}
+            disabled={busy || disabled || messageBlocked || Boolean(preview)}
           />
           <VoiceInputControl
             ref={voiceRef}
             className="lg:w-[min(280px,100%)] lg:shrink-0"
             value={draft}
             onChange={setDraft}
-            disabled={busy || disabled || messageBlocked}
+            disabled={busy || disabled || messageBlocked || Boolean(preview)}
           />
         </div>
 
-        {reality && reality.hasConcern && (
+        {reality && reality.hasConcern && !preview && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-bridge-ink">
             <p className="font-medium">{t.composer.realityHeader}</p>
             <ul className="mt-2 space-y-2">
@@ -179,7 +271,7 @@ export function PrivateComposer({
                 variant="secondary"
                 className="rounded-full"
                 disabled={busy}
-                onClick={() => send(true)}
+                onClick={() => void requestPreview(true)}
               >
                 {t.composer.sendAsIs}
               </Button>
@@ -201,6 +293,112 @@ export function PrivateComposer({
                 onClick={() => void quickRewrite("deeper")}
               >
                 {t.composer.addEvidence}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {preview && (
+          <div className="space-y-3 rounded-xl border border-bridge-sage/30 bg-bridge-mist/40 p-4 text-sm text-bridge-ink">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sageMuted">
+                {t.composer.previewHeader}
+              </p>
+              <p className="mt-1 text-xs text-bridge-stone">{t.composer.previewBlurb}</p>
+            </div>
+
+            <div className="rounded-lg border border-bridge-mist bg-white/70 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-bridge-stone">
+                {t.composer.yourDraftLabel}
+              </p>
+              <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-bridge-ink/80">
+                {preview.originalDraft}
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-bridge-sage/40 bg-white p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-bridge-sage">
+                {t.composer.mediatedLabel}
+              </p>
+              {editingPreview ? (
+                <Textarea
+                  className="mt-1 min-h-[120px]"
+                  value={preview.mediated}
+                  onChange={(e) =>
+                    setPreview((p) => (p ? { ...p, mediated: e.target.value } : p))
+                  }
+                  disabled={busy}
+                />
+              ) : (
+                <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-bridge-ink">
+                  {preview.mediated}
+                </p>
+              )}
+
+              {(preview.detectedIntent || typeof preview.escalationRisk === "number") && (
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-bridge-stone">
+                  {preview.detectedIntent && (
+                    <span>
+                      <span className="font-medium text-bridge-ink">
+                        {t.composer.intentLabel}:
+                      </span>{" "}
+                      {preview.detectedIntent}
+                    </span>
+                  )}
+                  {typeof preview.escalationRisk === "number" && (
+                    <span>
+                      <span className="font-medium text-bridge-ink">
+                        {t.composer.intensityLabel}:
+                      </span>{" "}
+                      {preview.escalationRisk}/10
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                className="rounded-full"
+                disabled={busy}
+                onClick={() =>
+                  void commit(editingPreview ? "mediated_edited" : "mediated")
+                }
+              >
+                {busy ? t.composer.sending : t.composer.sendMediated}
+              </Button>
+              {!editingPreview && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  className="rounded-full"
+                  disabled={busy}
+                  onClick={() => setEditingPreview(true)}
+                >
+                  {t.composer.editMediated}
+                </Button>
+              )}
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="rounded-full"
+                disabled={busy}
+                onClick={() => void handleSendOriginal()}
+              >
+                {t.composer.sendOriginal}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="rounded-full"
+                disabled={busy}
+                onClick={cancelPreview}
+              >
+                {t.composer.cancelPreview}
               </Button>
             </div>
           </div>
@@ -243,8 +441,8 @@ export function PrivateComposer({
           <Button
             type="button"
             className="rounded-full"
-            disabled={busy || disabled}
-            onClick={() => void send(false)}
+            disabled={busy || disabled || Boolean(preview)}
+            onClick={() => void requestPreview(false)}
           >
             {busy ? t.composer.sending : t.composer.send}
           </Button>

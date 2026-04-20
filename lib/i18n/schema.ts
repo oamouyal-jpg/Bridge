@@ -204,5 +204,29 @@ export type BridgeMessages = {
     makeFairer: string;
     separateFactFeeling: string;
     addAccountability: string;
+    /** Preview-before-send flow. */
+    previewHeader: string;
+    previewBlurb: string;
+    yourDraftLabel: string;
+    mediatedLabel: string;
+    editMediated: string;
+    sendMediated: string;
+    sendOriginal: string;
+    sendOriginalConfirm: string;
+    cancelPreview: string;
+    intentLabel: string;
+    intensityLabel: string;
+  };
+  sharedThread: {
+    heading: string;
+    emptyBody: string;
+    mediatedTag: string;
+    editedTag: string;
+    originalTag: string;
+    intentLabel: string;
+    readWithContext: string;
+    contextLoading: string;
+    contextHeading: string;
+    contextClose: string;
   };
 };

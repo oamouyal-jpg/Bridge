@@ -461,7 +461,12 @@ export default function RoomPage() {
             />
           </div>
           <div className="lg:col-span-1">
-            <SharedThread messages={data.sharedMessages ?? []} participants={participants} />
+            <SharedThread
+              roomId={rawId}
+              viewerParticipantId={myId}
+              messages={data.sharedMessages ?? []}
+              participants={participants}
+            />
           </div>
           <div className="lg:col-span-1">
             <InsightPanel cards={data.myInsights ?? []} />

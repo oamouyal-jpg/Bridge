@@ -252,5 +252,31 @@ export const he: BridgeMessages = {
     makeFairer: "להפוך את זה להוגן יותר",
     separateFactFeeling: "הפרדה בין עובדה לרגש",
     addAccountability: "הוספת אחריות אישית",
+    previewHeader: "לפני שזה נשלח",
+    previewBlurb:
+      "Bridge ניסח מחדש את הטיוטה שלך כדי להפחית התגוננות מבלי לאבד את מה שהתכוונת לומר. קרא/י וקבע/י איך לשלוח.",
+    yourDraftLabel: "הטיוטה הפרטית שלך",
+    mediatedLabel: "מה ישותף",
+    editMediated: "עריכה לפני שליחה",
+    sendMediated: "שליחת הגרסה המתווכת",
+    sendOriginal: "שליחת הנוסח המקורי שלי",
+    sendOriginalConfirm:
+      "הצד השני יראה את המילים המדויקות שלך ללא ריכוך. לשלוח בכל זאת?",
+    cancelPreview: "להמשיך לנסח",
+    intentLabel: "כוונה",
+    intensityLabel: "עוצמה",
+  },
+  sharedThread: {
+    heading: "שרשור הגישור המשותף",
+    emptyBody:
+      "הודעות מתווכות יופיעו כאן — רגועות, ברורות, ומתורגמות להבנה.",
+    mediatedTag: "מרוכך על ידי Bridge",
+    editedTag: "נוסח מתווך, נערך על ידי השולח",
+    originalTag: "הנוסח המקורי של השולח",
+    intentLabel: "כוונה",
+    readWithContext: "קריאה עם הקשר",
+    contextLoading: "קריאה בין השורות…",
+    contextHeading: "מה עשוי להיות מתחת",
+    contextClose: "סגירה",
   },
 };

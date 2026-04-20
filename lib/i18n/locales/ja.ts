@@ -115,4 +115,5 @@ export const ja: BridgeMessages = {
   room: en.room,
   intakeChat: en.intakeChat,
   composer: en.composer,
+  sharedThread: en.sharedThread,
 };

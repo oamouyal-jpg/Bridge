@@ -247,5 +247,31 @@ export const en: BridgeMessages = {
     makeFairer: "Make this fairer",
     separateFactFeeling: "Separate fact from feeling",
     addAccountability: "Add accountability",
+    previewHeader: "Before it's shared",
+    previewBlurb:
+      "Bridge rewrote your draft to reduce defensiveness without losing what you meant. Read it and choose how to send.",
+    yourDraftLabel: "Your private draft",
+    mediatedLabel: "What will be shared",
+    editMediated: "Edit before sending",
+    sendMediated: "Send mediated version",
+    sendOriginal: "Send my original wording",
+    sendOriginalConfirm:
+      "This will deliver your exact words to the other party without softening. Send anyway?",
+    cancelPreview: "Keep drafting",
+    intentLabel: "Intent",
+    intensityLabel: "Intensity",
+  },
+  sharedThread: {
+    heading: "Shared mediation thread",
+    emptyBody:
+      "Mediated messages will appear here — calm, readable, and translated for understanding.",
+    mediatedTag: "Softened by Bridge",
+    editedTag: "Mediated, then edited by sender",
+    originalTag: "Sender's own wording",
+    intentLabel: "Intent",
+    readWithContext: "Read with context",
+    contextLoading: "Reading between the lines…",
+    contextHeading: "What may be underneath",
+    contextClose: "Close",
   },
 };

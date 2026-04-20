@@ -16,6 +16,7 @@ import { analyzeSafetySignals } from "@/lib/safety-signals-service";
 import { screenPrivateMessage } from "@/lib/safety-service";
 import { saveRoomAggregate } from "@/lib/store";
 import type {
+  MessageAnalysis,
   PrivateRawMessage,
   SharedMediatedMessage,
   TranslationMode,
@@ -56,6 +57,24 @@ export async function POST(
       translationMode?: TranslationMode;
       confirmDespiteReality?: boolean;
       skipRealityCheck?: boolean;
+      /**
+       * When true, run safety + reality + mediation and RETURN the mediated
+       * text without persisting anything. The client then asks the sender to
+       * confirm, edit, or override before committing. Emotional-safety gate.
+       */
+      preview?: boolean;
+      /**
+       * When present on a commit call, persist this text as the shared
+       * mediated message verbatim (the sender has seen and approved it, or
+       * chose their own wording). Still screened for safety on the raw.
+       */
+      overrideMediated?: string;
+      /** Delivery provenance for the override path. Defaults to "mediated". */
+      deliveryMode?: "mediated" | "mediated_edited" | "sender_original";
+      /** Pre-computed analysis/intent/risk from a prior preview call. Optional. */
+      analysis?: MessageAnalysis;
+      detectedIntent?: string;
+      escalationRisk?: number;
     };
 
     const participantId = body.participantId ?? "";
@@ -121,22 +140,69 @@ export async function POST(
       );
     }
 
-    const mediated = await mediatePrivateMessage({
-      raw: content,
-      profile,
-      map,
-      mode,
-      room: groupRoom
-        ? {
-            category: agg.room.category,
-            participantCount: agg.participants.size,
-            senderDisplayName: participant.displayName,
-            senderParticipantId: participantId,
-            rosterMarkdown: rosterDisplayLines(agg),
-          }
-        : undefined,
-      locale,
-    });
+    const hasOverride = typeof body.overrideMediated === "string" && body.overrideMediated.trim().length > 0;
+    const deliveryMode: "mediated" | "mediated_edited" | "sender_original" =
+      body.deliveryMode ?? (hasOverride ? "mediated_edited" : "mediated");
+
+    // Decide whether we need to call the mediator model. We skip it when the
+    // sender has come back from a preview they already approved / edited and
+    // passed the text explicitly.
+    let mediatedText: string;
+    let detectedIntent: string | undefined;
+    let escalationRisk: number | undefined;
+    let analysis: MessageAnalysis | undefined;
+
+    if (hasOverride) {
+      mediatedText = body.overrideMediated!.trim();
+      detectedIntent = body.detectedIntent?.trim() || undefined;
+      escalationRisk =
+        typeof body.escalationRisk === "number" && !Number.isNaN(body.escalationRisk)
+          ? Math.min(10, Math.max(1, body.escalationRisk))
+          : undefined;
+      // Only keep analysis if the sender is using (possibly lightly edited)
+      // mediated content. A "sender_original" delivery intentionally has no
+      // mediator analysis since we did not rewrite it.
+      if (deliveryMode !== "sender_original" && body.analysis) {
+        analysis = body.analysis;
+      }
+    } else {
+      const mediated = await mediatePrivateMessage({
+        raw: content,
+        profile,
+        map,
+        mode,
+        room: groupRoom
+          ? {
+              category: agg.room.category,
+              participantCount: agg.participants.size,
+              senderDisplayName: participant.displayName,
+              senderParticipantId: participantId,
+              rosterMarkdown: rosterDisplayLines(agg),
+            }
+          : undefined,
+        locale,
+      });
+      mediatedText = mediated.mediatedMessage;
+      detectedIntent = mediated.detectedIntent;
+      escalationRisk = mediated.escalationRisk;
+      analysis = mediated.analysis;
+
+      // Preview-only: return what would be shared, persist nothing. The raw
+      // draft is not stored until the sender commits, so a cancelled preview
+      // leaves no trace in the room aggregate.
+      if (body.preview) {
+        return NextResponse.json({
+          ok: true,
+          phase: "preview",
+          preview: {
+            mediated: mediatedText,
+            detectedIntent,
+            escalationRisk,
+            analysis,
+          },
+        });
+      }
+    }
 
     const rawMsg: PrivateRawMessage = {
       id: `pr_${nanoid(12)}`,
@@ -151,9 +217,12 @@ export async function POST(
       id: `sm_${nanoid(12)}`,
       roomId: agg.room.id,
       sourceParticipantId: participantId,
-      mediatedContent: mediated.mediatedMessage,
-      detectedIntent: mediated.detectedIntent,
+      mediatedContent: mediatedText,
+      detectedIntent,
       createdAt: new Date().toISOString(),
+      escalationRisk,
+      analysis,
+      deliveryMode,
     };
     agg.sharedMessages.push(shared);
 
@@ -187,7 +256,8 @@ export async function POST(
       insights,
       riskState: agg.riskState,
       mediationMeta: {
-        escalationRisk: mediated.escalationRisk,
+        escalationRisk,
+        deliveryMode,
       },
     });
   } catch (e) {

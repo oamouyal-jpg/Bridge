@@ -253,5 +253,31 @@ export const fr: BridgeMessages = {
     makeFairer: "Rendre ceci plus juste",
     separateFactFeeling: "Séparer fait et ressenti",
     addAccountability: "Ajouter une responsabilité",
+    previewHeader: "Avant l'envoi",
+    previewBlurb:
+      "Bridge a reformulé votre brouillon pour réduire la défensive sans trahir votre sens. Relisez-le et choisissez comment l'envoyer.",
+    yourDraftLabel: "Votre brouillon privé",
+    mediatedLabel: "Ce qui sera partagé",
+    editMediated: "Modifier avant l'envoi",
+    sendMediated: "Envoyer la version médiée",
+    sendOriginal: "Envoyer mes mots originaux",
+    sendOriginalConfirm:
+      "Vos mots exacts seront envoyés à l'autre partie, sans adoucissement. Confirmer ?",
+    cancelPreview: "Continuer à écrire",
+    intentLabel: "Intention",
+    intensityLabel: "Intensité",
+  },
+  sharedThread: {
+    heading: "Fil de médiation partagé",
+    emptyBody:
+      "Les messages médiés apparaîtront ici — calmes, lisibles, traduits pour la compréhension.",
+    mediatedTag: "Adouci par Bridge",
+    editedTag: "Médié, puis modifié par l'expéditeur",
+    originalTag: "Mots originaux de l'expéditeur",
+    intentLabel: "Intention",
+    readWithContext: "Lire avec contexte",
+    contextLoading: "Lecture entre les lignes…",
+    contextHeading: "Ce qui pourrait se jouer en dessous",
+    contextClose: "Fermer",
   },
 };

@@ -112,6 +112,21 @@ export type PrivateRawMessage = {
   createdAt: string;
 };
 
+/**
+ * Per-message structured signal extracted by the mediator. Optional because
+ * mediation pre-dates this field (older rooms will not have it) and the
+ * sender may choose to override the mediated version with their own wording,
+ * in which case no analysis is computed.
+ */
+export type MessageAnalysis = {
+  feelings: string[];
+  needs: string[];
+  fears: string[];
+  intent: string;
+  /** 1–10 subjective emotional intensity the mediator inferred. */
+  intensity: number;
+};
+
 export type SharedMediatedMessage = {
   id: string;
   roomId: string;
@@ -119,6 +134,18 @@ export type SharedMediatedMessage = {
   mediatedContent: string;
   detectedIntent?: string;
   createdAt: string;
+  /** 1–10 inferred escalation risk of this specific mediated line. */
+  escalationRisk?: number;
+  /** Present when Bridge actually mediated the text. Absent when the sender
+   *  chose to deliver their own wording verbatim (still screened for safety). */
+  analysis?: MessageAnalysis;
+  /**
+   * How this message reached the shared thread:
+   *  - "mediated": AI rewrite of the raw draft (default).
+   *  - "mediated_edited": sender saw the mediation and edited it before sending.
+   *  - "sender_original": sender chose to send their own wording.
+   */
+  deliveryMode?: "mediated" | "mediated_edited" | "sender_original";
 };
 
 export type InsightCardType = "reflection" | "warning" | "goal" | "reframe" | "pattern";
