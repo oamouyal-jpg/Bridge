@@ -53,6 +53,8 @@ type RoomPayload = {
   messagesRemaining?: number | null;
   resolutionOutputs?: ResolutionGeneration[];
   latestInsightReport?: AdvancedInsightReport;
+  /** See `lib/free-mode.ts` — when true the client hides credit/paywall UI. */
+  freeMode?: boolean;
 };
 
 export default function RoomPage() {
@@ -446,6 +448,7 @@ export default function RoomPage() {
               messagesRemaining={msgsLeft ?? null}
               resolutionOutputs={resolutionOutputs}
               latestInsightReport={data.latestInsightReport}
+              freeMode={data.freeMode ?? false}
               onPaywall={(p) => setPaywallProduct(p)}
               onRefresh={refresh}
             />

@@ -13,7 +13,8 @@ async function main() {
   const tmp = mkdtempSync(join(tmpdir(), "bridge-smoke-"));
   const dbPath = join(tmp, "bridge.db");
   process.env.BRIDGE_DB_PATH = dbPath;
-  process.env.NODE_ENV = "test";
+  // NODE_ENV is typed as read-only on recent @types/node; cast to bypass.
+  (process.env as Record<string, string>).NODE_ENV = "test";
 
   const store = await import("../lib/store");
   const { createRoom } = await import("../lib/room-service");
@@ -30,7 +31,7 @@ async function main() {
     roomId: room.id,
     participantId: participant.id,
     createdAt: new Date().toISOString(),
-    rawText: "hello",
+    content: "hello",
   });
   aggregate.intakeMessages.set(participant.id, [
     {
@@ -58,8 +59,8 @@ async function main() {
       reloaded.intakeAssistantTurns.get(participant.id),
       1],
     ["privateRawMessages.length", reloaded.privateRawMessages.length, 1],
-    ["privateRawMessages[0].rawText",
-      reloaded.privateRawMessages[0]?.rawText,
+    ["privateRawMessages[0].content",
+      reloaded.privateRawMessages[0]?.content,
       "hello"],
   ] as const;
 

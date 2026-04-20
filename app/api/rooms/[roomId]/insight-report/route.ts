@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateAdvancedInsightReport } from "@/lib/advanced-insight-report-service";
+import { isFreeMode } from "@/lib/free-mode";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { getAggregate, resolveRoomIdFromCode } from "@/lib/room-service";
 import { saveRoomAggregate } from "@/lib/store";
@@ -21,7 +22,8 @@ export async function POST(
       return NextResponse.json({ error: "Invalid participant." }, { status: 400 });
     }
 
-    if ((agg.credits?.insightReport ?? 0) < 1) {
+    const freeMode = isFreeMode();
+    if (!freeMode && (agg.credits?.insightReport ?? 0) < 1) {
       return NextResponse.json(
         { error: "Insight report requires purchase.", code: "PAYWALL", feature: "insight" },
         { status: 402 }
@@ -43,7 +45,9 @@ export async function POST(
       locale,
     });
 
-    agg.credits!.insightReport -= 1;
+    if (!freeMode) {
+      agg.credits!.insightReport -= 1;
+    }
     agg.latestInsightReport = report;
     saveRoomAggregate(agg);
 

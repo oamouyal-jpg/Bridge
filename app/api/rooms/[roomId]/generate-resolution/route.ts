@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isFreeMode } from "@/lib/free-mode";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { generateResolution } from "@/lib/resolution-generator-service";
 import { getAggregate, resolveRoomIdFromCode } from "@/lib/room-service";
@@ -35,7 +36,8 @@ export async function POST(
       return NextResponse.json({ error: "Invalid type." }, { status: 400 });
     }
 
-    if ((agg.credits?.resolution ?? 0) < 1) {
+    const freeMode = isFreeMode();
+    if (!freeMode && (agg.credits?.resolution ?? 0) < 1) {
       return NextResponse.json(
         { error: "Resolution credits required.", code: "PAYWALL", feature: "resolution" },
         { status: 402 }
@@ -58,7 +60,9 @@ export async function POST(
       locale,
     });
 
-    agg.credits!.resolution -= 1;
+    if (!freeMode) {
+      agg.credits!.resolution -= 1;
+    }
     agg.resolutionOutputs.push(result);
     saveRoomAggregate(agg);
 

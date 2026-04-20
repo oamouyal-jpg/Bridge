@@ -24,6 +24,7 @@ export function MonetizationPanel({
   messagesRemaining,
   resolutionOutputs,
   latestInsightReport,
+  freeMode = false,
   onPaywall,
   onRefresh,
 }: {
@@ -37,6 +38,12 @@ export function MonetizationPanel({
   messagesRemaining: number | null;
   resolutionOutputs: ResolutionGeneration[];
   latestInsightReport?: AdvancedInsightReport;
+  /**
+   * When true the server has BRIDGE_FREE_MODE on, so every feature succeeds
+   * without a purchase. Hide credit counters, the +30 / unlimited / business
+   * upsells, and the "free messages left" warning so the UI matches reality.
+   */
+  freeMode?: boolean;
   onPaywall: (p: PaymentProductType) => void;
   onRefresh: () => Promise<void>;
 }) {
@@ -152,16 +159,20 @@ export function MonetizationPanel({
         <CardHeader>
           <CardTitle className="font-display text-lg">Outcomes & clarity</CardTitle>
           <p className="text-sm text-bridge-stone">
-            Free tier covers communication. Paid adds resolution tools, deeper insight, and longer
-            sessions.
+            {freeMode
+              ? "Every tool here is available — use what helps. These are ways to turn the conversation into something actionable."
+              : "Free tier covers communication. Paid adds resolution tools, deeper insight, and longer sessions."}
           </p>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
-          {messagesRemaining !== null && messagesRemaining <= 5 && messagesRemaining > 0 && (
-            <p className="rounded-xl bg-amber-50 px-3 py-2 text-amber-950">
-              {messagesRemaining} free mediated messages left in this room.
-            </p>
-          )}
+          {!freeMode &&
+            messagesRemaining !== null &&
+            messagesRemaining <= 5 &&
+            messagesRemaining > 0 && (
+              <p className="rounded-xl bg-amber-50 px-3 py-2 text-amber-950">
+                {messagesRemaining} free mediated messages left in this room.
+              </p>
+            )}
           {err && <p className="text-red-700">{err}</p>}
 
           <div>
@@ -204,7 +215,9 @@ export function MonetizationPanel({
                 Prepare for in-person discussion
               </Button>
             </div>
-            <p className="mt-1 text-xs text-bridge-stone">Credits: {credits.resolution}</p>
+            {!freeMode && (
+              <p className="mt-1 text-xs text-bridge-stone">Credits: {credits.resolution}</p>
+            )}
           </div>
 
           <div className="border-t border-bridge-mist pt-3">
@@ -217,7 +230,9 @@ export function MonetizationPanel({
             >
               {busy === "insight" ? "…" : "Advanced insight report"}
             </Button>
-            <p className="mt-1 text-xs text-bridge-stone">Credits: {credits.insightReport}</p>
+            {!freeMode && (
+              <p className="mt-1 text-xs text-bridge-stone">Credits: {credits.insightReport}</p>
+            )}
           </div>
 
           <div className="border-t border-bridge-mist pt-3">
@@ -251,33 +266,44 @@ export function MonetizationPanel({
                 Final message
               </Button>
             </div>
-            <p className="mt-1 text-xs text-bridge-stone">Credits: {credits.prepareConversation}</p>
-          </div>
-
-          <div className="flex flex-wrap gap-2 border-t border-bridge-mist pt-3">
-            <Button
-              size="sm"
-              variant="secondary"
-              className="rounded-full"
-              onClick={() => onPaywall("extend_session")}
-            >
-              +30 messages
-            </Button>
-            <Button size="sm" variant="secondary" className="rounded-full" onClick={() => onPaywall("subscription")}>
-              Unlimited (monthly)
-            </Button>
-            {(isBusiness || entitlements.businessMode) && (
-              <p className="w-full text-xs text-bridge-sage">
-                Business mode {entitlements.businessMode ? "active" : "available after purchase"} —
-                neutral tone and optional HR summary.
+            {!freeMode && (
+              <p className="mt-1 text-xs text-bridge-stone">
+                Credits: {credits.prepareConversation}
               </p>
             )}
-            {isBusiness && !entitlements.businessMode && (
-              <Button size="sm" className="rounded-full" onClick={() => onPaywall("business")}>
-                Unlock team pack
-              </Button>
-            )}
           </div>
+
+          {!freeMode && (
+            <div className="flex flex-wrap gap-2 border-t border-bridge-mist pt-3">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="rounded-full"
+                onClick={() => onPaywall("extend_session")}
+              >
+                +30 messages
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="rounded-full"
+                onClick={() => onPaywall("subscription")}
+              >
+                Unlimited (monthly)
+              </Button>
+              {(isBusiness || entitlements.businessMode) && (
+                <p className="w-full text-xs text-bridge-sage">
+                  Business mode {entitlements.businessMode ? "active" : "available after purchase"} —
+                  neutral tone and optional HR summary.
+                </p>
+              )}
+              {isBusiness && !entitlements.businessMode && (
+                <Button size="sm" className="rounded-full" onClick={() => onPaywall("business")}>
+                  Unlock team pack
+                </Button>
+              )}
+            </div>
+          )}
 
           {resolutionOutputs.length > 0 && (
             <div className="rounded-xl border border-bridge-mist bg-bridge-cream/40 p-3 text-xs">

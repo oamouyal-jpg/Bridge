@@ -1,3 +1,4 @@
+import { isFreeMode } from "./free-mode";
 import { FREE_SHARED_MESSAGE_LIMIT } from "./pricing";
 import type { Participant } from "./types";
 import type { RoomAggregate } from "./store";
@@ -37,5 +38,11 @@ export function projectRoomForParticipant(aggregate: RoomAggregate, participantI
     resolutionOutputs: aggregate.resolutionOutputs,
     latestInsightReport: aggregate.latestInsightReport,
     latestPrepare: aggregate.latestPrepare,
+    /**
+     * Exposed so the `MonetizationPanel` can hide credit counters, upsell CTAs,
+     * and the "messages remaining" warning. Driven by the `BRIDGE_FREE_MODE`
+     * env var — see `lib/free-mode.ts`.
+     */
+    freeMode: isFreeMode(),
   };
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isFreeMode } from "@/lib/free-mode";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { generatePrepareConversation } from "@/lib/prepare-conversation-service";
 import { getAggregate, resolveRoomIdFromCode } from "@/lib/room-service";
@@ -30,7 +31,8 @@ export async function POST(
       return NextResponse.json({ error: "Invalid kind." }, { status: 400 });
     }
 
-    if ((agg.credits?.prepareConversation ?? 0) < 1) {
+    const freeMode = isFreeMode();
+    if (!freeMode && (agg.credits?.prepareConversation ?? 0) < 1) {
       return NextResponse.json(
         { error: "Prepare conversation requires purchase.", code: "PAYWALL", feature: "prepare" },
         { status: 402 }
@@ -53,7 +55,9 @@ export async function POST(
       locale,
     });
 
-    agg.credits!.prepareConversation -= 1;
+    if (!freeMode) {
+      agg.credits!.prepareConversation -= 1;
+    }
     agg.latestPrepare = result;
     saveRoomAggregate(agg);
 
