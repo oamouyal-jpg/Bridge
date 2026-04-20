@@ -5,6 +5,7 @@ export const zh: BridgeMessages = {
     tagline: "伴侣 · 家庭 · 工作",
     join: "加入",
     startRoom: "创建房间",
+    getApp: "获取应用",
   },
   hero: {
     badge: "艰难对话的温柔空间",

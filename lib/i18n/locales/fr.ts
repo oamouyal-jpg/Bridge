@@ -5,6 +5,7 @@ export const fr: BridgeMessages = {
     tagline: "Couples · Famille · Travail",
     join: "Rejoindre",
     startRoom: "Ouvrir une salle",
+    getApp: "Obtenir l’app",
   },
   hero: {
     badge: "Un endroit plus doux pour un difficile entretien",

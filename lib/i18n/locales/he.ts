@@ -5,6 +5,7 @@ export const he: BridgeMessages = {
     tagline: "זוגות · משפחה · עבודה",
     join: "הצטרפות",
     startRoom: "פתיחת חדר",
+    getApp: "הורדת האפליקציה",
   },
   hero: {
     badge: "מקום רך יותר לשיחה קשה",

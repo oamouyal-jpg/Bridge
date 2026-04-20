@@ -1,6 +1,6 @@
 /** All marketing-home copy keyed for translation. */
 export type BridgeMessages = {
-  nav: { tagline: string; join: string; startRoom: string };
+  nav: { tagline: string; join: string; startRoom: string; getApp: string };
   hero: {
     badge: string;
     h1a: string;

@@ -5,6 +5,7 @@ export const ja: BridgeMessages = {
     tagline: "カップル · 家族 · 仕事",
     join: "参加",
     startRoom: "ルームを始める",
+    getApp: "アプリを入手",
   },
   hero: {
     badge: "難しい話のための、やわらかい場所",

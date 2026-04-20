@@ -21,6 +21,9 @@ function HomeHeader() {
         <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
           <LanguageSwitcher />
           <nav className="flex items-center gap-2">
+            <Link href="/download" className="bridge-btn-ghost text-sm">
+              {t.nav.getApp}
+            </Link>
             <Link href="/join" className="bridge-btn-ghost text-sm">
               {t.nav.join}
             </Link>
@@ -56,6 +59,11 @@ function HomeFooter() {
                 <li>
                   <Link href="/join" className="text-bridge-ink underline-offset-4 hover:underline">
                     {t.footer.joinCode}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/download" className="text-bridge-ink underline-offset-4 hover:underline">
+                    {t.nav.getApp}
                   </Link>
                 </li>
               </ul>

@@ -5,6 +5,7 @@ export const ar: BridgeMessages = {
     tagline: "الأزواج · العائلة · العمل",
     join: "انضمام",
     startRoom: "ابدأ غرفة",
+    getApp: "احصل على التطبيق",
   },
   hero: {
     badge: "مكان أنعم لحديث صعب",
