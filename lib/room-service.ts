@@ -3,9 +3,10 @@ import { defaultEntitlements, migrateMonetizationFields } from "@/lib/entitlemen
 import { clampMaxParticipants } from "@/lib/room-capacity";
 import type { Room, RoomCategory, RoomStatus, Participant, TranslationMode } from "./types";
 import {
-  getDataStore,
   getOrCreateAggregate,
+  hasInviteCode,
   registerNewRoom,
+  resolveRoomIdFromInviteCode,
   saveRoomAggregate,
   type RoomAggregate,
 } from "./store";
@@ -17,24 +18,19 @@ function nowIso() {
 }
 
 function uniqueInviteCode(): string {
-  const store = getDataStore();
   let code = "";
   for (let g = 0; g < 30; g++) {
     code = "";
     for (let i = 0; i < 6; i++) {
       code += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)];
     }
-    if (!store.inviteCodeToRoomId.has(code.toLowerCase())) return code;
+    if (!hasInviteCode(code)) return code;
   }
   return nanoid(6).toLowerCase();
 }
 
 export function resolveRoomIdFromCode(code: string): string | null {
-  const raw = code.trim().toLowerCase();
-  const store = getDataStore();
-  if (store.rooms.has(raw)) return raw;
-  if (store.rooms.has(code.trim())) return code.trim();
-  return store.inviteCodeToRoomId.get(raw) ?? null;
+  return resolveRoomIdFromInviteCode(code) ?? null;
 }
 
 export function createRoom(input: {

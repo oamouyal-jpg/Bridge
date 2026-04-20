@@ -15,8 +15,10 @@ import type {
 } from "./types";
 
 /**
- * Aggregated persistence for a room. Replace with DB rows later:
- * rooms, participants, messages, profiles, conflict_maps, insights.
+ * In-memory aggregate shape. This is the *runtime* representation: nested
+ * `Map`s so mutation sites stay cheap. The persistent store (SQLite) serializes
+ * this via `lib/stores/serialize.ts` — any new field added here must also be
+ * mirrored there or it will silently drop on the next save.
  */
 export type RoomAggregate = {
   room: Room;
@@ -40,56 +42,78 @@ export type RoomAggregate = {
   latestPrepare?: PrepareConversationResult;
 };
 
-export type BridgeDataStore = {
-  rooms: Map<string, RoomAggregate>;
-  inviteCodeToRoomId: Map<string, string>;
-};
-
-const GLOBAL_KEY = "__bridge_data_store_v2__";
-
-function emptyRoomAggregate(room: Room): RoomAggregate {
-  return {
-    room,
-    participants: new Map(),
-    intakeMessages: new Map(),
-    intakeAssistantTurns: new Map(),
-    profiles: new Map(),
-    privateRawMessages: [],
-    sharedMessages: [],
-    insightsByParticipant: new Map(),
-    credits: {
-      resolution: 0,
-      insightReport: 0,
-      prepareConversation: 0,
-    },
-    additionalMessageAllowance: 0,
-    resolutionOutputs: [],
-  };
+/**
+ * Storage backend contract. Both `memoryStore` and `createSqliteStore` satisfy
+ * it; which one we use is a pure env-var decision (see `selectStore` below).
+ * All call sites in the app must go through the functional API at the bottom
+ * of this file rather than reaching into a backend directly.
+ */
+export interface BridgeStore {
+  readonly kind: "memory" | "sqlite";
+  getAggregate(roomId: string): RoomAggregate | undefined;
+  saveAggregate(agg: RoomAggregate): void;
+  registerNewRoom(room: Room): RoomAggregate;
+  /** `codeLower` must already be lowercased by the caller */
+  resolveRoomIdFromInviteCode(codeLower: string): string | undefined;
+  /** `codeLower` must already be lowercased by the caller */
+  hasInviteCode(codeLower: string): boolean;
 }
 
-export function getDataStore(): BridgeDataStore {
-  const g = globalThis as unknown as Record<string, BridgeDataStore | undefined>;
-  if (!g[GLOBAL_KEY]) {
-    g[GLOBAL_KEY] = {
-      rooms: new Map(),
-      inviteCodeToRoomId: new Map(),
-    };
+let activeStore: BridgeStore | null = null;
+
+function selectStore(): BridgeStore {
+  if (activeStore) return activeStore;
+
+  const dbPath = process.env.BRIDGE_DB_PATH?.trim();
+  if (dbPath) {
+    /**
+     * Lazy-require the sqlite implementation so local dev / serverless edge
+     * builds that never set `BRIDGE_DB_PATH` don't have to load the native
+     * `better-sqlite3` binding at all.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require("./stores/sqlite-store") as typeof import("./stores/sqlite-store");
+    activeStore = mod.createSqliteStore(dbPath);
+    if (process.env.NODE_ENV !== "test") {
+      console.log(`[bridge] using SQLite store at ${dbPath}`);
+    }
+    return activeStore;
   }
-  return g[GLOBAL_KEY]!;
+
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mod = require("./stores/memory-store") as typeof import("./stores/memory-store");
+  activeStore = mod.memoryStore;
+  if (process.env.NODE_ENV !== "test") {
+    console.warn(
+      "[bridge] using IN-MEMORY store — data will NOT persist across restarts. Set BRIDGE_DB_PATH to enable SQLite."
+    );
+  }
+  return activeStore;
 }
+
+/** Test-only: drop the cached backend so the next call re-reads env vars. */
+export function __resetStoreForTests(): void {
+  activeStore = null;
+}
+
+// ---------- Functional API used by the rest of the app ----------
 
 export function getOrCreateAggregate(roomId: string): RoomAggregate | undefined {
-  return getDataStore().rooms.get(roomId);
+  return selectStore().getAggregate(roomId);
 }
 
 export function saveRoomAggregate(agg: RoomAggregate): void {
-  const store = getDataStore();
-  store.rooms.set(agg.room.id, agg);
-  store.inviteCodeToRoomId.set(agg.room.inviteCode.toLowerCase(), agg.room.id);
+  selectStore().saveAggregate(agg);
 }
 
 export function registerNewRoom(room: Room): RoomAggregate {
-  const agg = emptyRoomAggregate(room);
-  saveRoomAggregate(agg);
-  return agg;
+  return selectStore().registerNewRoom(room);
+}
+
+export function resolveRoomIdFromInviteCode(code: string): string | undefined {
+  return selectStore().resolveRoomIdFromInviteCode(code.trim().toLowerCase());
+}
+
+export function hasInviteCode(code: string): boolean {
+  return selectStore().hasInviteCode(code.trim().toLowerCase());
 }
