@@ -103,30 +103,64 @@ function inFlightKey(aggregate: RoomAggregate, participantId: string): string {
   return `${aggregate.room.id}:${participantId}`;
 }
 
-function mockTurn(isFirst: boolean): IntakeTurnResult {
-  if (isFirst) {
-    return {
-      message:
-        "What happened from your point of view — in your own words? I’m only asking about your experience right now.",
-      enough_information: false,
-      signals: {
-        possible_emotions: [],
-        possible_needs: [],
-        possible_fears: [],
-        possible_desired_outcomes: [],
-      },
-    };
-  }
-  return {
+/**
+ * Offline/mock intake ladder used when no OPENAI_API_KEY is configured. Each
+ * slot is a distinct question so repeated calls do not re-ask the same thing.
+ * We close at the fourth question regardless; `respondIntake` force-closes at
+ * `userTurns >= 3` anyway, so slot 3 is a safety fallback.
+ */
+const MOCK_QUESTION_LADDER: ReadonlyArray<{ message: string; signals: IntakeSignals }> = [
+  {
+    message:
+      "What happened from your point of view — in your own words? I’m only asking about your experience right now.",
+    signals: {
+      possible_emotions: [],
+      possible_needs: [],
+      possible_fears: [],
+      possible_desired_outcomes: [],
+    },
+  },
+  {
     message:
       "Thanks — what hurt you most about it, and what did you wish had happened instead?",
-    enough_information: false,
     signals: {
       possible_emotions: ["hurt"],
       possible_needs: ["understanding"],
       possible_fears: [],
       possible_desired_outcomes: ["repair"],
     },
+  },
+  {
+    message:
+      "What feels most at stake for you if this doesn’t get resolved — what are you afraid might happen or be lost?",
+    signals: {
+      possible_emotions: ["fearful"],
+      possible_needs: ["safety", "clarity"],
+      possible_fears: ["loss of connection", "not being heard"],
+      possible_desired_outcomes: [],
+    },
+  },
+  {
+    message:
+      "Last one for now — what would ‘better’ look like to you from here? Not perfect, just better.",
+    signals: {
+      possible_emotions: [],
+      possible_needs: ["movement", "a workable next step"],
+      possible_fears: [],
+      possible_desired_outcomes: ["repair", "clarity"],
+    },
+  },
+];
+
+/**
+ * @param questionIndex 0-based index of the assistant question we're about to ask.
+ */
+function mockTurn(questionIndex: number): IntakeTurnResult {
+  const slot = MOCK_QUESTION_LADDER[Math.min(questionIndex, MOCK_QUESTION_LADDER.length - 1)];
+  return {
+    message: slot.message,
+    enough_information: false,
+    signals: slot.signals,
   };
 }
 
@@ -151,7 +185,7 @@ export async function startParticipantIntake(
 
   const task = (async (): Promise<IntakeTurnResult> => {
     if (!isAiConfigured()) {
-      const turn = mockTurn(true);
+      const turn = mockTurn(0);
       pushMessage(aggregate, participantId, "assistant", turn.message);
       aggregate.intakeAssistantTurns.set(participantId, assistantTurns(aggregate, participantId));
       saveRoomAggregate(aggregate);
@@ -225,24 +259,37 @@ export async function respondIntake(
 
   if (!isAiConfigured()) {
     const forceDone = userTurns >= 3;
+    // `turnsBefore` is how many assistant questions have been asked already;
+    // the next question we're about to push is at that index (0-based).
+    const nextQuestionIndex = turnsBefore;
     const turn: IntakeTurnResult = forceDone
       ? {
           message:
             "I think I understand the shape of this well enough to begin mediation. We’ll move carefully from here.",
           enough_information: true,
-          signals: mockTurn(false).signals,
+          signals: MOCK_QUESTION_LADDER[MOCK_QUESTION_LADDER.length - 1].signals,
         }
-      : mockTurn(false);
+      : mockTurn(nextQuestionIndex);
     pushMessage(aggregate, participantId, "assistant", turn.message);
     aggregate.intakeAssistantTurns.set(participantId, assistantTurns(aggregate, participantId));
     saveRoomAggregate(aggregate);
     return turn;
   }
 
+  const thread = getThread(aggregate, participantId);
+  const priorAssistantMessages = thread
+    .filter((m) => m.role === "assistant")
+    .map((m) => m.content);
+  const priorAssistantBlock = priorAssistantMessages.length
+    ? `\nQuestions you have already asked (do NOT repeat any of these — each next question must explore a new angle: feelings, unmet need, fear, triggers, desired outcome, readiness):\n${priorAssistantMessages
+        .map((q, i) => `${i + 1}. ${q}`)
+        .join("\n")}\n`
+    : "";
+
   const userPrompt = `Here is the transcript so far between you and the participant:\n${transcriptForPrompt(
     aggregate,
     participantId
-  )}\n\nRules:\n- Ask only ONE next question OR close if enough_information.\n- If you already have enough detail for a hidden profile, set enough_information true.\n- Never ask more than a total of 8 assistant questions in a full intake; this assistant has asked ${turnsBefore} questions so far (not including this response).`;
+  )}\n${priorAssistantBlock}\nRules:\n- Ask only ONE next question OR close if enough_information.\n- Your next question MUST be materially different from every question listed above. Do not paraphrase a prior question. If you have already covered feelings and hurts, now ask about unmet need, fear, or desired outcome.\n- If you already have enough detail for a hidden profile, set enough_information true.\n- Never ask more than a total of 8 assistant questions in a full intake; this assistant has asked ${turnsBefore} questions so far (not including this response).`;
 
   const baseSystem =
     aggregate.participants.size > 2 ? `${INTAKE_SYSTEM}${GROUP_INTAKE_SYSTEM_APPEND}` : INTAKE_SYSTEM;
@@ -264,8 +311,53 @@ export async function respondIntake(
     };
   }
 
+  // Belt-and-braces: if the model still echoed a prior question verbatim or
+  // near-verbatim, treat intake as done rather than force the user to answer
+  // the same thing twice. `afterTurn >= 3` guarantees we've gathered enough
+  // for a profile before we short-circuit.
+  if (
+    afterTurn >= 3 &&
+    !normalized.enough_information &&
+    priorAssistantMessages.some((prior) => isNearDuplicate(prior, normalized.message))
+  ) {
+    normalized = {
+      ...normalized,
+      enough_information: true,
+      message:
+        "I think I understand the shape of this well enough to begin mediation. We’ll move carefully from here.",
+    };
+  }
+
   pushMessage(aggregate, participantId, "assistant", normalized.message);
   aggregate.intakeAssistantTurns.set(participantId, assistantTurns(aggregate, participantId));
   saveRoomAggregate(aggregate);
   return normalized;
+}
+
+function normalizeForDedupe(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isNearDuplicate(a: string, b: string): boolean {
+  const na = normalizeForDedupe(a);
+  const nb = normalizeForDedupe(b);
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  // Rough containment check: if the shorter is wholly inside the longer, or
+  // the two share >70% of their tokens, treat as duplicate. Good enough to
+  // catch "what hurt you most" / "what hurts the most".
+  if (na.length >= 20 && nb.length >= 20 && (na.includes(nb) || nb.includes(na))) return true;
+  const ta = new Set(na.split(" "));
+  const tb = new Set(nb.split(" "));
+  if (ta.size < 4 || tb.size < 4) return false;
+  let overlap = 0;
+  ta.forEach((t) => {
+    if (tb.has(t)) overlap++;
+  });
+  const denom = Math.min(ta.size, tb.size);
+  return denom > 0 && overlap / denom >= 0.7;
 }
