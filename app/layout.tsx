@@ -15,7 +15,25 @@ const fraunces = Fraunces({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+/**
+ * Accept only a well-formed absolute URL. A malformed NEXT_PUBLIC_APP_URL (e.g. a pasted
+ * placeholder like "https://<your-service>.onrender.com") used to crash the build inside
+ * `new URL(...)` during page-data collection; we fall back to localhost and log a warning.
+ */
+function resolveSiteUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (!raw) return "http://localhost:3000";
+  try {
+    return new URL(raw).toString().replace(/\/$/, "");
+  } catch {
+    console.warn(
+      `[bridge] NEXT_PUBLIC_APP_URL is not a valid URL ("${raw}"). Falling back to http://localhost:3000 for metadata.`
+    );
+    return "http://localhost:3000";
+  }
+}
+
+const siteUrl = resolveSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
