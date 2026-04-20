@@ -1,0 +1,126 @@
+/**
+ * Structural + fallback styles for Bridge UI.
+ * Tailwind remains primary; these rules keep the app readable if CSS chunks fail in dev.
+ */
+:root {
+  --bridge-cream: #fffbf7;
+  --bridge-sand: #f5ebe3;
+  --bridge-mist: #ead9cc;
+  --bridge-stone: #8a7f76;
+  --bridge-ink: #2f2823;
+  --bridge-sage: #6d8569;
+  --bridge-sage-soft: rgba(109, 133, 105, 0.16);
+  --bridge-peach-soft: rgba(255, 214, 196, 0.35);
+  --bridge-honey: #fff4e8;
+}
+
+.bridge-surface {
+  min-height: 100vh;
+  position: relative;
+  /* Solid base first — gradients are subtle tint only */
+  background-color: var(--bridge-cream);
+  background-image: radial-gradient(
+      ellipse 120% 80% at 50% -20%,
+      color-mix(in srgb, var(--bridge-sage) 10%, transparent),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 90% 60% at 100% 100%,
+      color-mix(in srgb, var(--bridge-mist) 35%, transparent),
+      transparent 50%
+    );
+  color: var(--bridge-ink);
+}
+
+/** Home over photography — no paint, room stays visible */
+.bridge-home-root {
+  min-height: 100vh;
+  position: relative;
+  background: transparent;
+  color: var(--bridge-ink);
+}
+
+/**
+ * Copy that sits “in” the room: high blur, low-opacity fill so the photo reads through.
+ * Use for hero columns, cards on marketing — not full-page white.
+ */
+.bridge-inroom-copy {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 251, 247, 0.2);
+  box-shadow: 0 12px 40px -10px rgba(47, 40, 35, 0.12);
+  backdrop-filter: blur(22px) saturate(1.12);
+  -webkit-backdrop-filter: blur(22px) saturate(1.12);
+}
+
+.bridge-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid color-mix(in srgb, var(--bridge-mist) 75%, transparent);
+  background: color-mix(in srgb, var(--bridge-cream) 88%, white);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 0 rgba(47, 40, 35, 0.04);
+}
+
+/** Glass nav — light so the room still reads behind it */
+.bridge-nav-glass {
+  background: rgba(255, 251, 247, 0.28);
+  backdrop-filter: blur(20px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  border-bottom-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 24px -8px rgba(47, 40, 35, 0.06);
+}
+
+.bridge-card {
+  border-radius: 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--bridge-mist) 75%, white);
+  background: #fff;
+  box-shadow: 0 8px 30px -12px rgba(47, 40, 35, 0.1);
+}
+
+.bridge-heading-display {
+  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  color: var(--bridge-ink);
+  font-feature-settings: "kern" 1, "liga" 1, "dlig" 1;
+  text-wrap: balance;
+}
+
+.bridge-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: linear-gradient(165deg, #3a322c 0%, var(--bridge-ink) 45%, #252019 100%);
+  color: var(--bridge-cream);
+  padding: 0.65rem 1.35rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(47, 40, 35, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.bridge-btn-primary:hover {
+  background: linear-gradient(165deg, #4a4039 0%, #3a322c 100%);
+  box-shadow: 0 6px 28px rgba(47, 40, 35, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+
+.bridge-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--bridge-mist);
+  background: white;
+  color: var(--bridge-ink);
+  padding: 0.65rem 1.35rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+.bridge-btn-ghost:hover {
+  background: var(--bridge-sand);
+}

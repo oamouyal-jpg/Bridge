@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  @apply bg-bridge-cream text-bridge-ink font-sans min-h-screen antialiased;
+}
+
+::selection {
+  background-color: color-mix(in srgb, #6d8569 30%, transparent);
+  color: #2f2823;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Marketing locale stacks — CJK / RTL read clearly with system fonts */
+.bridge-i18n-root:lang(he),
+.bridge-i18n-root:lang(ar) {
+  font-family: var(--font-dm-sans), "Segoe UI", system-ui, "Arial Hebrew", "David", "Noto Sans Hebrew",
+    "Noto Naskh Arabic", "Noto Sans Arabic", Tahoma, sans-serif;
+}
+
+.bridge-i18n-root:lang(zh-CN) {
+  font-family: var(--font-dm-sans), "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Hiragino Sans GB",
+    sans-serif;
+}
+
+.bridge-i18n-root:lang(ja) {
+  font-family: var(--font-dm-sans), "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+}
