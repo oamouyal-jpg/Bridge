@@ -1,5 +1,7 @@
 import { completeJson, isAiConfigured } from "./ai";
 import { groupSummaryUserPrefix } from "./group-mediation";
+import { localeSystemInstruction } from "./i18n/server-locale";
+import type { Locale } from "./i18n/types";
 import type { ConflictMap, SessionDebrief, SharedMediatedMessage } from "./types";
 
 const SUMMARY_SYSTEM = `You are generating a session debrief for an AI-mediated communication room.
@@ -21,6 +23,7 @@ export async function generateSessionDebrief(input: {
   map: ConflictMap;
   shared: SharedMediatedMessage[];
   participantCount?: number;
+  locale?: Locale;
 }): Promise<SessionDebrief> {
   if (!isAiConfigured()) {
     return {
@@ -41,7 +44,8 @@ export async function generateSessionDebrief(input: {
     .map((m) => `- ${m.sourceParticipantId}: ${m.mediatedContent}`)
     .join("\n")}`;
 
-  const raw = await completeJson<Record<string, unknown>>(SUMMARY_SYSTEM, user);
+  const system = input.locale ? `${SUMMARY_SYSTEM}${localeSystemInstruction(input.locale)}` : SUMMARY_SYSTEM;
+  const raw = await completeJson<Record<string, unknown>>(system, user);
 
   return {
     whatEachSideNeeds: arr(raw.whatEachSideNeeds),

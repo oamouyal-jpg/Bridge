@@ -1,4 +1,5 @@
 import type { BridgeMessages } from "../schema";
+import { en } from "./en";
 
 export const ja: BridgeMessages = {
   nav: {
@@ -107,4 +108,11 @@ export const ja: BridgeMessages = {
     unsplash: "Unsplash",
     photoSuffix: "。",
   },
+  common: en.common,
+  create: en.create,
+  join: en.join,
+  download: en.download,
+  room: en.room,
+  intakeChat: en.intakeChat,
+  composer: en.composer,
 };

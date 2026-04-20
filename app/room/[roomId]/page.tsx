@@ -32,6 +32,7 @@ import type {
 } from "@/lib/types";
 import { useRoomUiStore } from "@/stores/room-ui-store";
 import { WarmPageFrame } from "@/components/WarmPageFrame";
+import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 
 type RoomPayload = {
   room: Room;
@@ -57,6 +58,7 @@ export default function RoomPage() {
   const params = useParams<{ roomId: string }>();
   const router = useRouter();
   const rawId = params?.roomId ?? "";
+  const { t } = useBridgeLocale();
 
   const [data, setData] = useState<RoomPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -162,7 +164,7 @@ export default function RoomPage() {
             className="inline-block h-9 w-9 animate-pulse rounded-full bg-bridge-peach/50 ring-4 ring-bridge-sage/15 motion-reduce:animate-none"
             aria-hidden
           />
-          <p>Opening your room…</p>
+          <p>{t.room.loading}</p>
         </main>
       </WarmPageFrame>
     );
@@ -174,13 +176,10 @@ export default function RoomPage() {
         <main className="min-h-screen px-4 py-16">
           <Card className="mx-auto max-w-lg border-bridge-mist shadow-lg">
             <CardContent className="space-y-4 p-6 text-sm leading-relaxed text-bridge-stone">
-              <p className="text-bridge-ink">
-                To protect your privacy, this room opens on the same device where you created or
-                joined it.
-              </p>
-              <p>If you&apos;re on a new device, use your invite code to join again.</p>
+              <p className="text-bridge-ink">{t.room.noSessionBody1}</p>
+              <p>{t.room.noSessionBody2}</p>
               <Button asChild className="rounded-full">
-                <Link href="/join">Join with code</Link>
+                <Link href="/join">{t.room.noSessionButton}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -262,7 +261,7 @@ export default function RoomPage() {
 
       {room.status === "waiting_for_second_participant" && (
         <div className="mx-auto max-w-2xl px-4 py-8 text-center text-sm text-bridge-stone">
-          Updating room… refresh in a moment.
+          {t.room.updatingBanner}
         </div>
       )}
 
@@ -270,38 +269,30 @@ export default function RoomPage() {
         <div className="mx-auto max-w-2xl px-4 py-8">
           {participants.length === 1 ? (
             <div className="mb-4 space-y-3 rounded-2xl border border-bridge-sage/25 bg-gradient-to-br from-bridge-honey to-white p-5 text-sm text-bridge-ink shadow-sm">
-              <p className="font-medium">You&apos;re in a private space first — that&apos;s intentional.</p>
-              <p className="leading-relaxed text-bridge-stone">
-                Take your time with Bridge&apos;s questions. Nothing reaches anyone else until they
-                join, and the shared room only opens after everyone has had this private breathing
-                room.
-              </p>
-              <p className="leading-relaxed text-bridge-stone">
-                When you feel ready, send the invite below. They&apos;ll know they&apos;re stepping
-                into something gentle — and they&apos;ll get their own private questions too.
-              </p>
+              <p className="font-medium">{t.room.intake.soloHeading}</p>
+              <p className="leading-relaxed text-bridge-stone">{t.room.intake.soloBody1}</p>
+              <p className="leading-relaxed text-bridge-stone">{t.room.intake.soloBody2}</p>
             </div>
           ) : participants.length < joinCap ? (
             <div className="mb-4 space-y-2 rounded-2xl border border-bridge-sage/20 bg-gradient-to-br from-bridge-honey/80 to-white p-5 text-sm leading-relaxed text-bridge-ink shadow-sm">
               <p className="font-medium">
-                {participants.length} of {joinCap} people here — room for more
+                {t.room.intake.partialHeading
+                  .replace("{n}", String(participants.length))
+                  .replace("{cap}", String(joinCap))}
               </p>
-              <p className="text-bridge-stone">
-                Each person still gets their own private thread with Bridge first. Share the invite
-                until everyone who should be in this conversation has joined.
-              </p>
+              <p className="text-bridge-stone">{t.room.intake.partialBody}</p>
             </div>
           ) : (
             <div className="mb-4 space-y-2 rounded-2xl border border-bridge-mist bg-white p-5 text-sm leading-relaxed text-bridge-stone shadow-sm">
               <p className="font-medium text-bridge-ink">
-                {joinCap <= 2
-                  ? "Two private corners, one shared intention"
-                  : "Private intake for each person, one shared thread later"}
+                {joinCap <= 2 ? t.room.intake.readyHeadingPair : t.room.intake.readyHeadingGroup}
               </p>
               <p>
-                Each of you has a hidden thread with Bridge here. The door to mediation together opens
-                when <strong className="font-medium text-bridge-ink">everyone</strong> has finished
-                this step — no rushing, no surprises.
+                {t.room.intake.readyBody1}
+                <strong className="font-medium text-bridge-ink">
+                  {t.room.intake.readyBodyEmphasis}
+                </strong>
+                {t.room.intake.readyBody2}
               </p>
             </div>
           )}
@@ -321,12 +312,16 @@ export default function RoomPage() {
           {participants.length < joinCap && (
             <Card className="mt-8 border-bridge-mist bg-white">
               <CardContent className="space-y-4 p-6">
-                <p className="text-sm font-medium text-bridge-ink">Invite when you&apos;re ready</p>
+                <p className="text-sm font-medium text-bridge-ink">{t.room.intake.inviteTitle}</p>
                 <p className="text-sm text-bridge-stone">
-                  Code: <span className="font-mono text-lg text-bridge-ink">{room.inviteCode}</span>
+                  {t.room.intake.codeLabel}{" "}
+                  <span className="font-mono text-lg text-bridge-ink">{room.inviteCode}</span>
                   {joinCap > 2 && (
                     <span className="ms-2 text-bridge-stone">
-                      · {participants.length}/{joinCap} joined
+                      {" "}
+                      {t.room.intake.joinedCountSuffix
+                        .replace("{n}", String(participants.length))
+                        .replace("{cap}", String(joinCap))}
                     </span>
                   )}
                 </p>
@@ -336,7 +331,7 @@ export default function RoomPage() {
                   className="rounded-full"
                   onClick={() => navigator.clipboard.writeText(room.inviteCode)}
                 >
-                  Copy code
+                  {t.room.intake.copyCode}
                 </Button>
                 <ShareInviteLinks
                   inviteCode={room.inviteCode}
@@ -355,8 +350,9 @@ export default function RoomPage() {
           <Card className="border-bridge-mist bg-white">
             <CardContent className="space-y-3 p-6 text-sm text-bridge-stone">
               <p className="font-display text-lg text-bridge-ink">
-                Bridge has enough context from{" "}
-                {joinCap <= 2 ? "both sides" : "everyone in the room"} to begin mediated communication.
+                {joinCap <= 2
+                  ? t.room.readyForMediation.lineBothSides
+                  : t.room.readyForMediation.lineEveryone}
               </p>
               {data.conflictSummary && (
                 <p className="rounded-xl bg-bridge-sand/50 p-3 text-bridge-ink">{data.conflictSummary}</p>
@@ -366,7 +362,7 @@ export default function RoomPage() {
                 className="rounded-full"
                 onClick={() => void beginMediation().catch((e) => alert(e.message))}
               >
-                Begin mediation
+                {t.room.readyForMediation.begin}
               </Button>
             </CardContent>
           </Card>
@@ -416,9 +412,9 @@ export default function RoomPage() {
         <div className="mx-auto max-w-3xl space-y-6 px-4 py-10">
           <Card className="border-bridge-mist bg-white">
             <CardContent className="space-y-4 p-6 text-sm text-bridge-stone">
-              <h2 className="font-display text-xl text-bridge-ink">Session debrief</h2>
+              <h2 className="font-display text-xl text-bridge-ink">{t.room.debrief.title}</h2>
               <div>
-                <p className="font-medium text-bridge-ink">What each side seems to need</p>
+                <p className="font-medium text-bridge-ink">{t.room.debrief.whatEachSideNeeds}</p>
                 <ul className="mt-2 list-disc pl-5">
                   {data.debrief.whatEachSideNeeds.map((x) => (
                     <li key={x}>{x}</li>
@@ -426,11 +422,11 @@ export default function RoomPage() {
                 </ul>
               </div>
               <div>
-                <p className="font-medium text-bridge-ink">What is actually being struggled with</p>
+                <p className="font-medium text-bridge-ink">{t.room.debrief.coreStruggle}</p>
                 <p>{data.debrief.coreStruggle}</p>
               </div>
               <div>
-                <p className="font-medium text-bridge-ink">Where misunderstanding may remain</p>
+                <p className="font-medium text-bridge-ink">{t.room.debrief.misunderstandings}</p>
                 <ul className="mt-2 list-disc pl-5">
                   {data.debrief.misunderstandings.map((x) => (
                     <li key={x}>{x}</li>
@@ -438,12 +434,12 @@ export default function RoomPage() {
                 </ul>
               </div>
               <div>
-                <p className="font-medium text-bridge-ink">Best next step</p>
+                <p className="font-medium text-bridge-ink">{t.room.debrief.bestNextStep}</p>
                 <p>{data.debrief.bestNextStep}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button className="rounded-full" type="button" onClick={() => router.push("/create")}>
-                  Start a new room
+                  {t.room.debrief.startNewRoom}
                 </Button>
               </div>
             </CardContent>
@@ -459,7 +455,7 @@ export default function RoomPage() {
             type="button"
             onClick={() => void generateSummary().catch((e) => alert(e.message))}
           >
-            Generate session summary
+            {t.room.summaryBtn}
           </Button>
         </div>
       )}

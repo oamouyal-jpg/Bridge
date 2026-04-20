@@ -1,4 +1,4 @@
-/** All marketing-home copy keyed for translation. */
+/** All user-facing UI copy keyed for translation. */
 export type BridgeMessages = {
   nav: { tagline: string; join: string; startRoom: string; getApp: string };
   hero: {
@@ -75,5 +75,125 @@ export type BridgeMessages = {
     photoPrefix: string;
     unsplash: string;
     photoSuffix: string;
+  };
+  common: {
+    backHome: string;
+  };
+  create: {
+    title: string;
+    description: string;
+    roomTitleLabel: string;
+    roomTitlePlaceholder: string;
+    displayNameLabel: string;
+    displayNamePlaceholder: string;
+    contextLabel: string;
+    categoryRelationship: string;
+    categoryFamily: string;
+    categoryFriendship: string;
+    categoryWorkplace: string;
+    categoryOther: string;
+    maxPeopleLabel: string;
+    maxPeopleNote: string;
+    submit: string;
+    submitting: string;
+  };
+  join: {
+    title: string;
+    description: string;
+    inviteCodeLabel: string;
+    inviteCodePlaceholder: string;
+    displayNameLabel: string;
+    submit: string;
+    submitting: string;
+  };
+  download: {
+    title: string;
+    intro: string;
+    openInBrowser: string;
+    ios: string;
+    play: string;
+    notConfiguredYet: string;
+    afterInstalling: string;
+  };
+  room: {
+    loading: string;
+    noSessionBody1: string;
+    noSessionBody2: string;
+    noSessionButton: string;
+    updatingBanner: string;
+    header: {
+      yourRoom: string;
+      exit: string;
+      copyTitle: string;
+      copyAriaPrefix: string;
+      copied: string;
+      copyBlocked: string;
+      statusWaiting: string;
+      statusIntake: string;
+      statusReady: string;
+      statusActive: string;
+      statusPaused: string;
+      statusCompleted: string;
+    };
+    intake: {
+      soloHeading: string;
+      soloBody1: string;
+      soloBody2: string;
+      /** Use `{n}` and `{cap}` placeholders. */
+      partialHeading: string;
+      partialBody: string;
+      readyHeadingPair: string;
+      readyHeadingGroup: string;
+      readyBody1: string;
+      readyBodyEmphasis: string;
+      readyBody2: string;
+      inviteTitle: string;
+      codeLabel: string;
+      /** Use `{n}` and `{cap}` placeholders. */
+      joinedCountSuffix: string;
+      copyCode: string;
+    };
+    readyForMediation: {
+      lineBothSides: string;
+      lineEveryone: string;
+      begin: string;
+    };
+    debrief: {
+      title: string;
+      whatEachSideNeeds: string;
+      coreStruggle: string;
+      misunderstandings: string;
+      bestNextStep: string;
+      startNewRoom: string;
+    };
+    summaryBtn: string;
+  };
+  intakeChat: {
+    header: string;
+    privacyNote: string;
+    thinking: string;
+    placeholder: string;
+    send: string;
+    sending: string;
+  };
+  composer: {
+    header: string;
+    typeOrSpeak: string;
+    blurb: string;
+    messageBlocked: string;
+    draftPlaceholder: string;
+    send: string;
+    sending: string;
+    realityHeader: string;
+    sendAsIs: string;
+    reviseWithFairness: string;
+    addEvidence: string;
+    sayMoreClearly: string;
+    sayMoreGently: string;
+    sayWhatIMean: string;
+    fairnessHelpers: string;
+    makeFairer: string;
+    separateFactFeeling: string;
+    addAccountability: string;
   };
 };

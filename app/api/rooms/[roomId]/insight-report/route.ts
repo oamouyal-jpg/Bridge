@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateAdvancedInsightReport } from "@/lib/advanced-insight-report-service";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { getAggregate, resolveRoomIdFromCode } from "@/lib/room-service";
 import { saveRoomAggregate } from "@/lib/store";
 import type { ParticipantProfile } from "@/lib/types";
@@ -34,10 +35,12 @@ export async function POST(
       return NextResponse.json({ error: "Profiles or conflict map not ready." }, { status: 400 });
     }
 
+    const locale = await getRequestLocale();
     const report = await generateAdvancedInsightReport({
       sharedMessages: agg.sharedMessages,
       profiles,
       map: agg.conflictMap,
+      locale,
     });
 
     agg.credits!.insightReport -= 1;

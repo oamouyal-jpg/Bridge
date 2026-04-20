@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 import "./bridge-surface.css";
+import { BridgeLocaleProvider } from "@/components/i18n/BridgeLocaleProvider";
 
 const dmSans = DM_Sans({
   subsets: ["latin", "latin-ext"],
@@ -77,7 +78,7 @@ export default function RootLayout({
           fontFamily: "var(--font-dm-sans), system-ui, sans-serif",
         }}
       >
-        {children}
+        <BridgeLocaleProvider>{children}</BridgeLocaleProvider>
       </body>
     </html>
   );

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { WarmPageFrame } from "@/components/WarmPageFrame";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 import { saveSession } from "@/lib/bridge-session";
 import {
   ROOM_PARTICIPANT_CAP_MAX,
@@ -15,16 +17,16 @@ import {
 } from "@/lib/room-capacity";
 import type { RoomCategory } from "@/lib/types";
 
-const categories: { id: RoomCategory; label: string }[] = [
-  { id: "relationship", label: "Relationship" },
-  { id: "family", label: "Family" },
-  { id: "friendship", label: "Friendship" },
-  { id: "workplace", label: "Workplace" },
-  { id: "other", label: "Other" },
-];
-
 export default function CreateRoomPage() {
   const router = useRouter();
+  const { t } = useBridgeLocale();
+  const categories: { id: RoomCategory; label: string }[] = [
+    { id: "relationship", label: t.create.categoryRelationship },
+    { id: "family", label: t.create.categoryFamily },
+    { id: "friendship", label: t.create.categoryFriendship },
+    { id: "workplace", label: t.create.categoryWorkplace },
+    { id: "other", label: t.create.categoryOther },
+  ];
   const [title, setTitle] = useState("");
   const [name, setName] = useState("");
   const [category, setCategory] = useState<RoomCategory>("relationship");
@@ -74,42 +76,42 @@ export default function CreateRoomPage() {
     <WarmPageFrame>
       <main className="min-h-screen px-4 py-12 sm:py-20">
         <div className="mx-auto max-w-lg">
-          <Link href="/" className="text-sm text-bridge-stone transition-colors hover:text-bridge-ink">
-            ← Back home
-          </Link>
+          <div className="flex items-center justify-between">
+            <Link href="/" className="text-sm text-bridge-stone transition-colors hover:text-bridge-ink">
+              {t.common.backHome}
+            </Link>
+            <LanguageSwitcher />
+          </div>
           <Card className="mt-6 border-bridge-mist shadow-[0_20px_60px_-24px_rgba(47,40,35,0.1)]">
             <CardHeader>
-              <CardTitle className="font-display text-2xl">Create a room</CardTitle>
-              <CardDescription>
-                Private intake first, then a shared mediated thread. Couple rooms are for two
-                people; family and workplace rooms can include more.
-              </CardDescription>
+              <CardTitle className="font-display text-2xl">{t.create.title}</CardTitle>
+              <CardDescription>{t.create.description}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={onSubmit} className="space-y-5">
                 <label className="block text-sm font-medium text-bridge-ink">
-                  Room title
+                  {t.create.roomTitleLabel}
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="mt-2"
-                    placeholder="e.g. About last weekend"
+                    placeholder={t.create.roomTitlePlaceholder}
                     disabled={loading}
                   />
                 </label>
                 <label className="block text-sm font-medium text-bridge-ink">
-                  Your display name
+                  {t.create.displayNameLabel}
                   <Input
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="mt-2"
-                    placeholder="How you want to appear"
+                    placeholder={t.create.displayNamePlaceholder}
                     disabled={loading}
                   />
                 </label>
                 <div>
-                  <p className="text-sm font-medium text-bridge-ink">Context</p>
+                  <p className="text-sm font-medium text-bridge-ink">{t.create.contextLabel}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {categories.map((c) => (
                       <button
@@ -129,10 +131,9 @@ export default function CreateRoomPage() {
                 </div>
                 {category !== "relationship" && (
                   <label className="block text-sm font-medium text-bridge-ink">
-                    How many people total?
+                    {t.create.maxPeopleLabel}
                     <span className="mt-1 block text-xs font-normal text-bridge-stone">
-                      Including you. {ROOM_PARTICIPANT_CAP_MIN}–{ROOM_PARTICIPANT_CAP_MAX} — everyone
-                      gets private intake before the shared thread.
+                      {t.create.maxPeopleNote} ({ROOM_PARTICIPANT_CAP_MIN}–{ROOM_PARTICIPANT_CAP_MAX})
                     </span>
                     <select
                       className="mt-2 w-full rounded-lg border border-bridge-mist bg-white px-3 py-2 text-sm text-bridge-ink"
@@ -159,7 +160,7 @@ export default function CreateRoomPage() {
                   </p>
                 )}
                 <Button type="submit" disabled={loading} className="w-full rounded-full">
-                  {loading ? "Creating…" : "Create room"}
+                  {loading ? t.create.submitting : t.create.submit}
                 </Button>
               </form>
             </CardContent>

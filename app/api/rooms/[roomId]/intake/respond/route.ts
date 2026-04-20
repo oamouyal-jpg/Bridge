@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { buildConflictMap } from "@/lib/conflict-map-service";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { respondIntake } from "@/lib/intake-service";
 import { extractParticipantProfile } from "@/lib/profile-service";
 import { bumpRoomStatus, getAggregate, resolveRoomIdFromCode } from "@/lib/room-service";
@@ -27,7 +28,8 @@ export async function POST(
       return NextResponse.json({ error: "Intake is not active." }, { status: 400 });
     }
 
-    const turn = await respondIntake(agg, participantId, message);
+    const locale = await getRequestLocale();
+    const turn = await respondIntake(agg, participantId, message, locale);
 
     if (turn.enough_information) {
       await extractParticipantProfile(agg, participantId);

@@ -7,10 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { WarmPageFrame } from "@/components/WarmPageFrame";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 import { saveSession } from "@/lib/bridge-session";
 
 export default function JoinRoomPage() {
   const router = useRouter();
+  const { t } = useBridgeLocale();
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -56,33 +59,32 @@ export default function JoinRoomPage() {
     <WarmPageFrame>
       <main className="min-h-screen px-4 py-12 sm:py-20">
         <div className="mx-auto max-w-lg">
-          <Link href="/" className="text-sm text-bridge-stone transition-colors hover:text-bridge-ink">
-            ← Back home
-          </Link>
+          <div className="flex items-center justify-between">
+            <Link href="/" className="text-sm text-bridge-stone transition-colors hover:text-bridge-ink">
+              {t.common.backHome}
+            </Link>
+            <LanguageSwitcher />
+          </div>
           <Card className="mt-6 border-bridge-mist shadow-[0_20px_60px_-24px_rgba(47,40,35,0.1)]">
             <CardHeader>
-              <CardTitle className="font-display text-2xl">Join a room</CardTitle>
-              <CardDescription>
-                You were invited into a gentler kind of conversation. If they&apos;re still in their
-                private background chat, that&apos;s okay — you&apos;ll get your own space first, then
-                the shared room opens when you&apos;re both ready.
-              </CardDescription>
+              <CardTitle className="font-display text-2xl">{t.join.title}</CardTitle>
+              <CardDescription>{t.join.description}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={onSubmit} className="space-y-5">
                 <label className="block text-sm font-medium text-bridge-ink">
-                  Invite code
+                  {t.join.inviteCodeLabel}
                   <Input
                     required
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     className="mt-2 font-mono"
-                    placeholder="6 characters"
+                    placeholder={t.join.inviteCodePlaceholder}
                     disabled={loading}
                   />
                 </label>
                 <label className="block text-sm font-medium text-bridge-ink">
-                  Display name
+                  {t.join.displayNameLabel}
                   <Input
                     required
                     value={name}
@@ -97,7 +99,7 @@ export default function JoinRoomPage() {
                   </p>
                 )}
                 <Button type="submit" disabled={loading} className="w-full rounded-full">
-                  {loading ? "Joining…" : "Join room"}
+                  {loading ? t.join.submitting : t.join.submit}
                 </Button>
               </form>
             </CardContent>

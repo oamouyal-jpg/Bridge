@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isGroupMediationRoom } from "@/lib/group-mediation";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { getAggregate, resolveRoomIdFromCode } from "@/lib/room-service";
 import { rewriteDraft, type RewriteKind } from "@/lib/rewrite-service";
 
@@ -31,12 +32,14 @@ export async function POST(
       return NextResponse.json({ error: "Not ready." }, { status: 400 });
     }
 
+    const locale = await getRequestLocale();
     const text = await rewriteDraft({
       text: draft,
       kind,
       profile,
       map,
       groupRoom: isGroupMediationRoom(agg),
+      locale,
     });
     return NextResponse.json({ draft: text });
   } catch (e) {

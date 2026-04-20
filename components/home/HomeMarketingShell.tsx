@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FeatureCards } from "@/components/FeatureCards";
 import { LandingHero } from "@/components/LandingHero";
 import { ShareAppLink } from "@/components/ShareAppLink";
-import { BridgeLocaleProvider, useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
+import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
 function HomeHeader() {
@@ -109,9 +109,5 @@ function HomeMarketingInner() {
 }
 
 export function HomeMarketingShell() {
-  return (
-    <BridgeLocaleProvider>
-      <HomeMarketingInner />
-    </BridgeLocaleProvider>
-  );
+  return <HomeMarketingInner />;
 }

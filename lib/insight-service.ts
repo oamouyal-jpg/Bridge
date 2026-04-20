@@ -1,6 +1,8 @@
 import { nanoid } from "nanoid";
 import { completeJson, isAiConfigured } from "./ai";
 import { GROUP_INSIGHT_USER_APPEND } from "./group-mediation";
+import { localeSystemInstruction } from "./i18n/server-locale";
+import type { Locale } from "./i18n/types";
 import type { ConflictMap, InsightCard, InsightCardType, ParticipantProfile } from "./types";
 
 const INSIGHT_SYSTEM = `You are a private reflection assistant inside a mediation app.
@@ -40,6 +42,7 @@ export async function generateInsightCards(input: {
   map: ConflictMap;
   /** When true, several people may read the eventual mediated line — cards stay dignified and non-"win". */
   groupRoom?: boolean;
+  locale?: Locale;
 }): Promise<InsightCard[]> {
   if (!isAiConfigured()) {
     return [
@@ -74,8 +77,9 @@ export async function generateInsightCards(input: {
     2
   )}\n\nConflict map:\n${JSON.stringify(input.map, null, 2)}`;
 
+  const system = input.locale ? `${INSIGHT_SYSTEM}${localeSystemInstruction(input.locale)}` : INSIGHT_SYSTEM;
   const raw = await completeJson<{ cards?: { title?: string; body?: string; type?: string }[] }>(
-    INSIGHT_SYSTEM,
+    system,
     user
   );
 

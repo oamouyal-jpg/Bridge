@@ -9,6 +9,7 @@ import { useRoomUiStore } from "@/stores/room-ui-store";
 import type { RealityCheckResult, TranslationMode } from "@/lib/types";
 import { TranslationModeSelector } from "./TranslationModeSelector";
 import { VoiceInputControl } from "./VoiceInputControl";
+import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 
 export function PrivateComposer({
   roomId,
@@ -26,6 +27,7 @@ export function PrivateComposer({
   onMessageBlocked?: () => void;
   onSent: () => Promise<void> | void;
 }) {
+  const { t } = useBridgeLocale();
   const draft = useRoomUiStore((s) => s.draft);
   const setDraft = useRoomUiStore((s) => s.setDraft);
   const translationMode = useRoomUiStore((s) => s.translationMode);
@@ -81,9 +83,7 @@ export function PrivateComposer({
       };
       if (res.status === 402 && data.code === "MESSAGE_LIMIT") {
         onMessageBlocked?.();
-        setError(
-          "You’ve reached the free session limit. Continue with +30 messages or unlimited monthly."
-        );
+        setError(t.composer.messageBlocked);
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Could not send.");
@@ -113,17 +113,14 @@ export function PrivateComposer({
       <CardContent className="space-y-4 p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sageMuted">
-            Private composer
+            {t.composer.header}
           </p>
           <span className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wide text-bridge-sage">
             <Mic className="h-3.5 w-3.5" aria-hidden />
-            Type or speak
+            {t.composer.typeOrSpeak}
           </span>
         </div>
-        <p className="text-xs text-bridge-stone">
-          Say what you really want to express — by keyboard or voice. Only the AI-mediated version
-          will be shared.
-        </p>
+        <p className="text-xs text-bridge-stone">{t.composer.blurb}</p>
 
         <TranslationModeSelector
           value={translationMode as TranslationMode}
@@ -133,7 +130,7 @@ export function PrivateComposer({
 
         {messageBlocked && (
           <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
-            You&apos;ve reached the free session limit for this room. Upgrade to keep mediating.
+            {t.composer.messageBlocked}
           </p>
         )}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
@@ -141,7 +138,7 @@ export function PrivateComposer({
             className="min-h-[140px] lg:min-h-[160px] lg:flex-1"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Write or dictate your private draft…"
+            placeholder={t.composer.draftPlaceholder}
             disabled={busy || disabled || messageBlocked}
           />
           <VoiceInputControl
@@ -154,7 +151,7 @@ export function PrivateComposer({
 
         {reality && reality.hasConcern && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-bridge-ink">
-            <p className="font-medium">Reality check (private)</p>
+            <p className="font-medium">{t.composer.realityHeader}</p>
             <ul className="mt-2 space-y-2">
               {reality.flags.map((f) => (
                 <li key={f.title}>
@@ -172,7 +169,7 @@ export function PrivateComposer({
                 disabled={busy}
                 onClick={() => send(true)}
               >
-                Send as is
+                {t.composer.sendAsIs}
               </Button>
               <Button
                 type="button"
@@ -181,7 +178,7 @@ export function PrivateComposer({
                 disabled={busy}
                 onClick={() => void quickRewrite("clearer")}
               >
-                Revise with fairness
+                {t.composer.reviseWithFairness}
               </Button>
               <Button
                 type="button"
@@ -191,7 +188,7 @@ export function PrivateComposer({
                 disabled={busy}
                 onClick={() => void quickRewrite("deeper")}
               >
-                Add evidence / depth
+                {t.composer.addEvidence}
               </Button>
             </div>
           </div>
@@ -206,7 +203,7 @@ export function PrivateComposer({
             disabled={busy || disabled}
             onClick={() => void quickRewrite("clearer")}
           >
-            Say it more clearly
+            {t.composer.sayMoreClearly}
           </Button>
           <Button
             type="button"
@@ -216,7 +213,7 @@ export function PrivateComposer({
             disabled={busy || disabled}
             onClick={() => void quickRewrite("gentler")}
           >
-            Say it more gently
+            {t.composer.sayMoreGently}
           </Button>
           <Button
             type="button"
@@ -226,7 +223,7 @@ export function PrivateComposer({
             disabled={busy || disabled}
             onClick={() => void quickRewrite("deeper")}
           >
-            Say what I really mean
+            {t.composer.sayWhatIMean}
           </Button>
         </div>
 
@@ -237,20 +234,20 @@ export function PrivateComposer({
             disabled={busy || disabled}
             onClick={() => void send(false)}
           >
-            {busy ? "Sending…" : "Send through Bridge"}
+            {busy ? t.composer.sending : t.composer.send}
           </Button>
         </div>
 
         <div className="flex flex-wrap gap-2 text-[11px] text-bridge-stone">
-          <span className="font-medium text-bridge-ink">Fairness helpers:</span>
+          <span className="font-medium text-bridge-ink">{t.composer.fairnessHelpers}</span>
           <button type="button" className="underline" onClick={() => void quickRewrite("gentler")}>
-            Make this fairer
+            {t.composer.makeFairer}
           </button>
           <button type="button" className="underline" onClick={() => void quickRewrite("clearer")}>
-            Separate fact from feeling
+            {t.composer.separateFactFeeling}
           </button>
           <button type="button" className="underline" onClick={() => void quickRewrite("deeper")}>
-            Add accountability
+            {t.composer.addAccountability}
           </button>
         </div>
 

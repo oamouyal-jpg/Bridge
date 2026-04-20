@@ -107,4 +107,140 @@ export const he: BridgeMessages = {
     unsplash: "Unsplash",
     photoSuffix: ".",
   },
+  common: {
+    backHome: "→ חזרה לדף הבית",
+  },
+  create: {
+    title: "פתיחת חדר",
+    description:
+      "קודם אינטייק פרטי, אחר כך שיחה משותפת במתווך. חדרי זוגות מיועדים לשניים; חדרי משפחה ועבודה יכולים לכלול יותר משתתפים.",
+    roomTitleLabel: "שם החדר",
+    roomTitlePlaceholder: "למשל: על סוף השבוע האחרון",
+    displayNameLabel: "שם התצוגה שלך",
+    displayNamePlaceholder: "איך תרצה/י להופיע",
+    contextLabel: "הקשר",
+    categoryRelationship: "זוגיות",
+    categoryFamily: "משפחה",
+    categoryFriendship: "חברות",
+    categoryWorkplace: "עבודה",
+    categoryOther: "אחר",
+    maxPeopleLabel: "כמה אנשים בסך הכול?",
+    maxPeopleNote:
+      "כולל/ת אותך. לכל אחד יש אינטייק פרטי לפני השיחה המשותפת.",
+    submit: "יצירת חדר",
+    submitting: "יוצר…",
+  },
+  join: {
+    title: "הצטרפות לחדר",
+    description:
+      "הוזמנת לשיחה עדינה יותר. אם הצד השני עדיין נמצא בשיחה הפרטית שלו, זה בסדר — גם את/ה תקבל/י מרחב משלך קודם, והחדר המשותף ייפתח כששניכם מוכנים.",
+    inviteCodeLabel: "קוד הזמנה",
+    inviteCodePlaceholder: "6 תווים",
+    displayNameLabel: "שם תצוגה",
+    submit: "הצטרפות לחדר",
+    submitting: "מצטרף…",
+  },
+  download: {
+    title: "קבלת Bridge",
+    intro:
+      "השתמשו ב־Bridge בדפדפן בכל מכשיר — או התקינו מחנות האפליקציות כשהוא יהיה זמין.",
+    openInBrowser: "פתיחת Bridge בדפדפן",
+    ios: "הורדה מה־App Store",
+    play: "הורדה מ־Google Play",
+    notConfiguredYet:
+      "קישורי App Store ו־Google Play יופיעו כאן אוטומטית לאחר ההגדרה — עד אז, השתמשו ב־Bridge בדפדפן; זה עובד בטלפונים ובטאבלטים.",
+    afterInstalling:
+      "לאחר ההתקנה, פתחו שוב את קישור ההזמנה — או היכנסו באותו דפדפן שבו יצרתם או הצטרפתם לחדר.",
+  },
+  room: {
+    loading: "פותח את החדר שלך…",
+    noSessionBody1:
+      "כדי להגן על הפרטיות שלך, החדר נפתח במכשיר שבו יצרת אותו או הצטרפת אליו.",
+    noSessionBody2:
+      "אם את/ה ממכשיר חדש, השתמש/י בקוד ההזמנה כדי להצטרף מחדש.",
+    noSessionButton: "הצטרפות עם קוד",
+    updatingBanner: "מעדכן את החדר… רענן/י בעוד רגע.",
+    header: {
+      yourRoom: "החדר שלך",
+      exit: "יציאה",
+      copyTitle: "לחצ/י להעתקה",
+      copyAriaPrefix: "העתקת קוד הזמנה",
+      copied: "הועתק",
+      copyBlocked: "העתקה חסומה — סמנ/י את הקוד ידנית",
+      statusWaiting: "מעדכן…",
+      statusIntake: "אינטייק פרטי",
+      statusReady: "מוכן",
+      statusActive: "פעיל",
+      statusPaused: "בהפסקה",
+      statusCompleted: "הושלם",
+    },
+    intake: {
+      soloHeading: "את/ה נמצא/ת במרחב פרטי תחילה — זה במכוון.",
+      soloBody1:
+        "קח/י את הזמן שלך עם השאלות של Bridge. דבר לא מגיע לאחרים עד שיצטרפו, והחדר המשותף נפתח רק אחרי שלכולם היה הרווח הפרטי הזה.",
+      soloBody2:
+        "כשאת/ה מרגיש/ה מוכן/ה, שלח/י את ההזמנה למטה. הם יידעו שהם נכנסים למרחב עדין — וגם הם יקבלו שאלות פרטיות משלהם.",
+      partialHeading: "{n} מתוך {cap} אנשים כאן — יש מקום לעוד",
+      partialBody:
+        "לכל אדם עדיין יש שיחה פרטית משלו עם Bridge קודם. שתפו את ההזמנה עד שכל מי שצריך להיות בשיחה הזו הצטרף.",
+      readyHeadingPair: "שתי פינות פרטיות, כוונה משותפת אחת",
+      readyHeadingGroup:
+        "אינטייק פרטי לכל אחד, ואחר כך שיחה משותפת אחת",
+      readyBody1:
+        "לכל אחד מכם יש שיחה סמויה עם Bridge כאן. הדלת לגישור יחד נפתחת כאשר ",
+      readyBodyEmphasis: "כולם",
+      readyBody2: " סיימו את השלב הזה — בלי לחץ, בלי הפתעות.",
+      inviteTitle: "הזמנה כשאת/ה מוכן/ה",
+      codeLabel: "קוד:",
+      joinedCountSuffix: "· {n}/{cap} הצטרפו",
+      copyCode: "העתקת קוד",
+    },
+    readyForMediation: {
+      lineBothSides:
+        "ל־Bridge יש מספיק הקשר משני הצדדים כדי להתחיל תקשורת במתווך.",
+      lineEveryone:
+        "ל־Bridge יש מספיק הקשר מכולם בחדר כדי להתחיל תקשורת במתווך.",
+      begin: "התחלת גישור",
+    },
+    debrief: {
+      title: "סיכום המפגש",
+      whatEachSideNeeds: "מה כל צד זקוק לו, כך נראה",
+      coreStruggle: "על מה באמת נאבקים",
+      misunderstandings: "איפה עשויה להישאר אי־הבנה",
+      bestNextStep: "הצעד הבא המומלץ",
+      startNewRoom: "פתיחת חדר חדש",
+    },
+    summaryBtn: "יצירת סיכום מפגש",
+  },
+  intakeChat: {
+    header: "להבין את הצד שלך",
+    privacyNote:
+      "זה פרטי. הצד השני לא רואה את התשובות שלך. צעד אחד בכל פעם.",
+    thinking: "חושב…",
+    placeholder: "הקלד/י או הכתב/י את תשובתך…",
+    send: "שליחה",
+    sending: "שולח…",
+  },
+  composer: {
+    header: "עורך פרטי",
+    typeOrSpeak: "הקלדה או דיבור",
+    blurb:
+      "אמר/י באמת מה שאת/ה רוצה לבטא — בכתיבה או בדיבור. רק הגרסה המתווכת תישלח לצד השני.",
+    messageBlocked:
+      "הגעת למכסה החינמית של החדר הזה. שדרג/י כדי להמשיך בגישור.",
+    draftPlaceholder: "כתוב/י או הכתב/י את הטיוטה הפרטית שלך…",
+    send: "שליחה דרך Bridge",
+    sending: "שולח…",
+    realityHeader: "בדיקת מציאות (פרטי)",
+    sendAsIs: "שליחה כפי שזה",
+    reviseWithFairness: "ניסוח מחדש בהגינות",
+    addEvidence: "הוספת עומק / דוגמאות",
+    sayMoreClearly: "לומר בצורה ברורה יותר",
+    sayMoreGently: "לומר בעדינות יותר",
+    sayWhatIMean: "לומר מה שבאמת התכוונתי",
+    fairnessHelpers: "עזרי הגינות:",
+    makeFairer: "להפוך את זה להוגן יותר",
+    separateFactFeeling: "הפרדה בין עובדה לרגש",
+    addAccountability: "הוספת אחריות אישית",
+  },
 };

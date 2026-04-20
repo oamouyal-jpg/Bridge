@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceInputControl } from "@/components/VoiceInputControl";
+import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 import type { IntakeMessage } from "@/lib/types";
 
 export function IntakeChat({
@@ -18,6 +19,7 @@ export function IntakeChat({
   initialMessages: IntakeMessage[];
   onUpdate: () => Promise<void> | void;
 }) {
+  const { t } = useBridgeLocale();
   const [messages, setMessages] = useState<IntakeMessage[]>(initialMessages);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -79,11 +81,9 @@ export function IntakeChat({
       <CardContent className="space-y-4 p-5 sm:p-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sageMuted">
-            Understanding your side
+            {t.intakeChat.header}
           </p>
-          <p className="mt-1 text-sm text-bridge-stone">
-            This is private. The other person can&apos;t see your answers. One step at a time.
-          </p>
+          <p className="mt-1 text-sm text-bridge-stone">{t.intakeChat.privacyNote}</p>
         </div>
         <div className="max-h-[420px] space-y-3 overflow-y-auto rounded-xl border border-bridge-mist bg-bridge-cream/40 p-3">
           {messages.map((m) => (
@@ -98,7 +98,7 @@ export function IntakeChat({
               {m.content}
             </div>
           ))}
-          {busy && <p className="text-xs text-bridge-stone">Thinking…</p>}
+          {busy && <p className="text-xs text-bridge-stone">{t.intakeChat.thinking}</p>}
         </div>
         {error && (
           <p className="text-sm text-red-700">{error}</p>
@@ -108,7 +108,7 @@ export function IntakeChat({
             className="min-h-[120px] sm:min-h-[140px] sm:flex-1"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type or dictate your answer…"
+            placeholder={t.intakeChat.placeholder}
             disabled={busy}
           />
           <VoiceInputControl
@@ -120,7 +120,7 @@ export function IntakeChat({
           />
         </div>
         <Button type="button" className="w-full rounded-full" disabled={busy} onClick={send}>
-          {busy ? "Sending…" : "Send"}
+          {busy ? t.intakeChat.sending : t.intakeChat.send}
         </Button>
       </CardContent>
     </Card>

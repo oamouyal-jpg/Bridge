@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { startParticipantIntake } from "@/lib/intake-service";
 import { getAggregate, resolveRoomIdFromCode } from "@/lib/room-service";
 
@@ -22,7 +23,8 @@ export async function POST(
       return NextResponse.json({ error: "Intake is not active." }, { status: 400 });
     }
 
-    const turn = await startParticipantIntake(agg, participantId);
+    const locale = await getRequestLocale();
+    const turn = await startParticipantIntake(agg, participantId, locale);
     return NextResponse.json({ turn });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Could not start intake.";

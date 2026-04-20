@@ -1,5 +1,7 @@
 import { completeJson, isAiConfigured } from "./ai";
 import { GROUP_MEDIATION_SYSTEM_APPEND } from "./group-mediation";
+import { localeSystemInstruction } from "./i18n/server-locale";
+import type { Locale } from "./i18n/types";
 import type { ConflictMap, ParticipantProfile, RoomCategory, TranslationMode } from "./types";
 
 const MEDIATOR_SYSTEM_BASE = `You are an AI mediator inside a conflict communication app.
@@ -56,6 +58,7 @@ export async function mediatePrivateMessage(input: {
   map: ConflictMap;
   mode: TranslationMode;
   room?: MediationGroupRoomContext;
+  locale?: Locale;
 }): Promise<MediationOutput> {
   const raw = input.raw.trim();
   if (!raw) throw new Error("Message is empty.");
@@ -74,7 +77,10 @@ export async function mediatePrivateMessage(input: {
     };
   }
 
-  const system = group ? `${MEDIATOR_SYSTEM_BASE}${GROUP_MEDIATION_SYSTEM_APPEND}` : MEDIATOR_SYSTEM_BASE;
+  const baseSystem = group
+    ? `${MEDIATOR_SYSTEM_BASE}${GROUP_MEDIATION_SYSTEM_APPEND}`
+    : MEDIATOR_SYSTEM_BASE;
+  const system = input.locale ? `${baseSystem}${localeSystemInstruction(input.locale)}` : baseSystem;
 
   const userParts = [
     `Translation mode: ${input.mode}`,

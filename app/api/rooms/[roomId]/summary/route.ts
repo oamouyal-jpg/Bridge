@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { getAggregate, resolveRoomIdFromCode, bumpRoomStatus } from "@/lib/room-service";
 import { generateSessionDebrief } from "@/lib/summary-service";
 import { saveRoomAggregate } from "@/lib/store";
@@ -18,10 +19,12 @@ export async function POST(
       return NextResponse.json({ error: "Conflict map not available." }, { status: 400 });
     }
 
+    const locale = await getRequestLocale();
     const debrief = await generateSessionDebrief({
       map,
       shared: agg.sharedMessages,
       participantCount: agg.participants.size,
+      locale,
     });
 
     agg.debrief = debrief;

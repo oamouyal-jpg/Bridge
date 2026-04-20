@@ -1,4 +1,6 @@
 import { completeJson, isAiConfigured } from "./ai";
+import { localeSystemInstruction } from "./i18n/server-locale";
+import type { Locale } from "./i18n/types";
 import type { AdvancedInsightReport, ConflictMap, ParticipantProfile, SharedMediatedMessage } from "./types";
 
 function groupReportUserPrefix(profileCount: number): string {
@@ -24,6 +26,7 @@ export async function generateAdvancedInsightReport(input: {
   sharedMessages: SharedMediatedMessage[];
   profiles: ParticipantProfile[];
   map: ConflictMap;
+  locale?: Locale;
 }): Promise<AdvancedInsightReport> {
   const thread = input.sharedMessages.map((m) => m.mediatedContent).join("\n---\n");
   const prefix = groupReportUserPrefix(input.profiles.length);
@@ -52,7 +55,8 @@ export async function generateAdvancedInsightReport(input: {
     };
   }
 
-  const raw = await completeJson<Record<string, unknown>>(SYSTEM, user);
+  const system = input.locale ? `${SYSTEM}${localeSystemInstruction(input.locale)}` : SYSTEM;
+  const raw = await completeJson<Record<string, unknown>>(system, user);
 
   return {
     emotionalPatterns: arr(raw.emotionalPatterns),

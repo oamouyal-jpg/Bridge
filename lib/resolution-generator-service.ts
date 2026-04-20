@@ -1,5 +1,7 @@
 import { completeJson, isAiConfigured } from "./ai";
 import { groupPrepareResolutionUserAppend } from "./group-mediation";
+import { localeSystemInstruction } from "./i18n/server-locale";
+import type { Locale } from "./i18n/types";
 import type {
   ConflictMap,
   ParticipantProfile,
@@ -25,6 +27,7 @@ export async function generateResolution(input: {
   sharedMessages: SharedMediatedMessage[];
   profiles: ParticipantProfile[];
   map: ConflictMap;
+  locale?: Locale;
 }): Promise<ResolutionGeneration> {
   const thread = input.sharedMessages.map((m) => m.mediatedContent).join("\n---\n");
   const groupTail = groupPrepareResolutionUserAppend(input.profiles.length);
@@ -65,12 +68,13 @@ ${thread}${groupTail}`;
     };
   }
 
+  const system = input.locale ? `${SYSTEM}${localeSystemInstruction(input.locale)}` : SYSTEM;
   const raw = await completeJson<{
     title?: string;
     steps?: unknown;
     exampleMessage?: string;
     guidance?: unknown;
-  }>(SYSTEM, user);
+  }>(system, user);
 
   return {
     type: input.type,

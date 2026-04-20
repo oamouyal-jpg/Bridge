@@ -1,5 +1,7 @@
 import { completeJson, isAiConfigured } from "./ai";
 import { groupPrepareResolutionUserAppend } from "./group-mediation";
+import { localeSystemInstruction } from "./i18n/server-locale";
+import type { Locale } from "./i18n/types";
 import type {
   ConflictMap,
   ParticipantProfile,
@@ -25,6 +27,7 @@ export async function generatePrepareConversation(input: {
   sharedMessages: SharedMediatedMessage[];
   profiles: ParticipantProfile[];
   map: ConflictMap;
+  locale?: Locale;
 }): Promise<PrepareConversationResult> {
   const thread = input.sharedMessages.map((m) => m.mediatedContent).join("\n---\n");
   const groupTail = groupPrepareResolutionUserAppend(input.profiles.length);
@@ -52,12 +55,13 @@ Thread:\n${thread}${groupTail}`;
     };
   }
 
+  const system = input.locale ? `${SYSTEM}${localeSystemInstruction(input.locale)}` : SYSTEM;
   const raw = await completeJson<{
     whatToSay?: unknown;
     whatToAvoid?: unknown;
     triggersToWatch?: unknown;
     toneGuidance?: string;
-  }>(SYSTEM, user);
+  }>(system, user);
 
   return {
     kind: input.kind,

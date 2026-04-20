@@ -1,5 +1,7 @@
 import { completeJson, isAiConfigured } from "./ai";
 import { GROUP_REWRITE_USER_APPEND } from "./group-mediation";
+import { localeSystemInstruction } from "./i18n/server-locale";
+import type { Locale } from "./i18n/types";
 import type { ParticipantProfile, ConflictMap } from "./types";
 
 export type RewriteKind = "clearer" | "gentler" | "deeper";
@@ -14,6 +16,7 @@ export async function rewriteDraft(input: {
   profile: ParticipantProfile;
   map: ConflictMap;
   groupRoom?: boolean;
+  locale?: Locale;
 }): Promise<string> {
   const t = input.text.trim();
   if (!t) return "";
@@ -39,6 +42,7 @@ export async function rewriteDraft(input: {
     2
   )}\n\nConflict map summary:\n${input.map.summary}`;
 
-  const res = await completeJson<{ draft?: string }>(BASE, user);
+  const system = input.locale ? `${BASE}${localeSystemInstruction(input.locale)}` : BASE;
+  const res = await completeJson<{ draft?: string }>(system, user);
   return String(res.draft ?? t).trim();
 }

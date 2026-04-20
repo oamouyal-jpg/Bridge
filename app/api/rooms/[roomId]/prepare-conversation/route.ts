@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { generatePrepareConversation } from "@/lib/prepare-conversation-service";
 import { getAggregate, resolveRoomIdFromCode } from "@/lib/room-service";
 import { saveRoomAggregate } from "@/lib/store";
@@ -43,11 +44,13 @@ export async function POST(
       return NextResponse.json({ error: "Profiles or conflict map not ready." }, { status: 400 });
     }
 
+    const locale = await getRequestLocale();
     const result = await generatePrepareConversation({
       kind,
       sharedMessages: agg.sharedMessages,
       profiles,
       map: agg.conflictMap,
+      locale,
     });
 
     agg.credits!.prepareConversation -= 1;

@@ -1,5 +1,7 @@
 import { completeJson, isAiConfigured } from "./ai";
 import { GROUP_REALITY_CHECK_APPEND } from "./group-mediation";
+import { localeSystemInstruction } from "./i18n/server-locale";
+import type { Locale } from "./i18n/types";
 import type { RealityCheckResult, RealityFlagType } from "./types";
 
 const REALITY_SYSTEM = `You are a private fairness and reality-check assistant inside an AI mediation app.
@@ -53,7 +55,8 @@ export async function runRealityCheck(
   draft: string,
   priorContext?: string,
   /** When "group", the draft may be read by several people — tighten triangulation / pile-on checks. */
-  roomMode: "pair" | "group" = "pair"
+  roomMode: "pair" | "group" = "pair",
+  locale?: Locale
 ): Promise<RealityCheckResult> {
   const d = draft.trim();
   if (!d) {
@@ -94,7 +97,8 @@ export async function runRealityCheck(
 
   const groupTail = roomMode === "group" ? GROUP_REALITY_CHECK_APPEND : "";
   const user = `Draft:\n${d}${groupTail}\n\nEarlier private context (optional):\n${priorContext ?? "(none)"}`;
-  const raw = await completeJson<RealityCheckResult>(REALITY_SYSTEM, user);
+  const system = locale ? `${REALITY_SYSTEM}${localeSystemInstruction(locale)}` : REALITY_SYSTEM;
+  const raw = await completeJson<RealityCheckResult>(system, user);
 
   const flags = Array.isArray(raw.flags)
     ? raw.flags.map((f) => ({

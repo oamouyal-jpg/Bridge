@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
 import { isGroupMediationRoom, rosterDisplayLines } from "@/lib/group-mediation";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { generateInsightCards } from "@/lib/insight-service";
 import { mediatePrivateMessage } from "@/lib/mediation-service";
 import { runRealityCheck } from "@/lib/reality-check-service";
@@ -90,12 +91,14 @@ export async function POST(
       .join("\n");
 
     const groupRoom = isGroupMediationRoom(agg);
+    const locale = await getRequestLocale();
 
     if (!body.skipRealityCheck && !body.confirmDespiteReality) {
       const reality = await runRealityCheck(
         content,
         priorContext,
-        groupRoom ? "group" : "pair"
+        groupRoom ? "group" : "pair",
+        locale
       );
       const blocking =
         reality.hasConcern &&
@@ -132,6 +135,7 @@ export async function POST(
             rosterMarkdown: rosterDisplayLines(agg),
           }
         : undefined,
+      locale,
     });
 
     const rawMsg: PrivateRawMessage = {
@@ -160,6 +164,7 @@ export async function POST(
       profile,
       map,
       groupRoom,
+      locale,
     });
     agg.insightsByParticipant.set(participantId, insights);
 

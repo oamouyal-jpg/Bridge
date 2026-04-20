@@ -1,6 +1,8 @@
 import { nanoid } from "nanoid";
 import { completeJson, isAiConfigured } from "./ai";
 import { GROUP_INTAKE_SYSTEM_APPEND } from "./group-mediation";
+import { localeSystemInstruction } from "./i18n/server-locale";
+import type { Locale } from "./i18n/types";
 import type { IntakeMessage, IntakeSignals, IntakeTurnResult } from "./types";
 import type { RoomAggregate } from "./store";
 import { saveRoomAggregate } from "./store";
@@ -130,7 +132,8 @@ function mockTurn(isFirst: boolean): IntakeTurnResult {
 
 export async function startParticipantIntake(
   aggregate: RoomAggregate,
-  participantId: string
+  participantId: string,
+  locale?: Locale
 ): Promise<IntakeTurnResult> {
   const existingThread = getThread(aggregate, participantId);
   if (existingThread.length > 0) {
@@ -157,8 +160,9 @@ export async function startParticipantIntake(
 
     const userPrompt = `Transcript so far:\n(Conversation beginning — ask your first question only.)\nParticipant display context: private intake.`;
 
-    const intakeSystem =
+    const baseSystem =
       aggregate.participants.size > 2 ? `${INTAKE_SYSTEM}${GROUP_INTAKE_SYSTEM_APPEND}` : INTAKE_SYSTEM;
+    const intakeSystem = locale ? `${baseSystem}${localeSystemInstruction(locale)}` : baseSystem;
     const parsed = await completeJson<IntakeTurnResult>(intakeSystem, userPrompt);
     const normalized = normalizeTurn(parsed);
     if (getThread(aggregate, participantId).length > 0) {
@@ -208,7 +212,8 @@ function normalizeSignals(s?: IntakeSignals): IntakeSignals {
 export async function respondIntake(
   aggregate: RoomAggregate,
   participantId: string,
-  userText: string
+  userText: string,
+  locale?: Locale
 ): Promise<IntakeTurnResult> {
   const text = userText.trim();
   if (!text) throw new Error("Message is empty.");
@@ -239,8 +244,9 @@ export async function respondIntake(
     participantId
   )}\n\nRules:\n- Ask only ONE next question OR close if enough_information.\n- If you already have enough detail for a hidden profile, set enough_information true.\n- Never ask more than a total of 8 assistant questions in a full intake; this assistant has asked ${turnsBefore} questions so far (not including this response).`;
 
-  const intakeSystem =
+  const baseSystem =
     aggregate.participants.size > 2 ? `${INTAKE_SYSTEM}${GROUP_INTAKE_SYSTEM_APPEND}` : INTAKE_SYSTEM;
+  const intakeSystem = locale ? `${baseSystem}${localeSystemInstruction(locale)}` : baseSystem;
   const parsed = await completeJson<IntakeTurnResult>(intakeSystem, userPrompt);
   let normalized = normalizeTurn(parsed);
 
