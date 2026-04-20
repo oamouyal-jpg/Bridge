@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IntakeChat } from "@/components/IntakeChat";
 import { InsightPanel } from "@/components/InsightPanel";
 import { PrivateComposer } from "@/components/PrivateComposer";
 import { RoomHeader } from "@/components/RoomHeader";
+import { RoomJoinToasts, type RoomJoinToast } from "@/components/RoomJoinToasts";
 import { SharedThread } from "@/components/SharedThread";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -123,14 +124,71 @@ export default function RoomPage() {
     }
   }, [data?.me?.translationMode]);
 
-  /** Soft updates so “other party still in background” changes without manual refresh. */
+  /**
+   * Soft updates: we also poll during `waiting_for_second_participant` so the
+   * creator sees the moment someone joins (toast in `RoomJoinToasts`), not
+   * just when they manually refresh. Slightly faster cadence while waiting.
+   */
   useEffect(() => {
-    if (!session || data?.room?.status !== "intake_in_progress") return;
-    const t = window.setInterval(() => {
-      void refresh();
-    }, 12_000);
-    return () => window.clearInterval(t);
+    if (!session) return;
+    const status = data?.room?.status;
+    const isWaiting = status === "waiting_for_second_participant";
+    const isIntake = status === "intake_in_progress";
+    if (!isWaiting && !isIntake) return;
+    const tick = window.setInterval(
+      () => {
+        void refresh();
+      },
+      isWaiting ? 6_000 : 12_000
+    );
+    return () => window.clearInterval(tick);
   }, [data?.room?.status, refresh, session]);
+
+  /**
+   * Detect *new* participants between polls and surface a toast. We seed the
+   * baseline on first load (so pre-existing others don't spam toasts), then
+   * compare ids on every subsequent snapshot.
+   */
+  const knownOtherIdsRef = useRef<Set<string> | null>(null);
+  const [joinToasts, setJoinToasts] = useState<RoomJoinToast[]>([]);
+  useEffect(() => {
+    const others = data?.others;
+    if (!others) return;
+    const currentIds = new Set(others.map((o) => o.id));
+    const prior = knownOtherIdsRef.current;
+    if (!prior) {
+      knownOtherIdsRef.current = currentIds;
+      return;
+    }
+    const arrived = others.filter((o) => !prior.has(o.id));
+    if (arrived.length > 0) {
+      const toast: RoomJoinToast = {
+        id: `join-${Date.now()}-${arrived.map((a) => a.id).join("-")}`,
+        names: arrived.map((a) => a.displayName || "Someone"),
+      };
+      setJoinToasts((ts) => [...ts, toast]);
+      // Flash the document title when the tab is backgrounded so the creator
+      // notices even without the window focused. Reverts on next navigation.
+      if (typeof document !== "undefined" && document.hidden) {
+        const original = document.title;
+        document.title = `• ${toast.names.join(", ")} joined — Bridge`;
+        const revert = () => {
+          document.title = original;
+          document.removeEventListener("visibilitychange", revert);
+        };
+        document.addEventListener("visibilitychange", revert);
+      }
+      // Auto-dismiss after 8s.
+      window.setTimeout(() => {
+        setJoinToasts((ts) => ts.filter((t) => t.id !== toast.id));
+      }, 8_000);
+    }
+    knownOtherIdsRef.current = currentIds;
+  }, [data?.others]);
+
+  const dismissToast = useCallback((id: string) => {
+    setJoinToasts((ts) => ts.filter((t) => t.id !== id));
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined" || !session) return;
@@ -250,6 +308,7 @@ export default function RoomPage() {
   return (
     <WarmPageFrame>
     <main className="min-h-screen">
+      <RoomJoinToasts toasts={joinToasts} onDismiss={dismissToast} />
       <PaywallModal
         open={paywallProduct !== null}
         product={paywallProduct}

@@ -167,6 +167,15 @@ export type BridgeMessages = {
       startNewRoom: string;
     };
     summaryBtn: string;
+    toast: {
+      /** "{name} joined" — use `{name}` placeholder */
+      joinedTitle: string;
+      /** "{name} is now in their private session" — use `{name}` placeholder */
+      joinedBody: string;
+      /** Plural when multiple join at once. Use `{names}` placeholder */
+      joinedBodyMulti: string;
+      dismiss: string;
+    };
   };
   intakeChat: {
     header: string;

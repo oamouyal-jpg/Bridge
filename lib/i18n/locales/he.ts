@@ -215,6 +215,12 @@ export const he: BridgeMessages = {
       startNewRoom: "פתיחת חדר חדש",
     },
     summaryBtn: "יצירת סיכום מפגש",
+    toast: {
+      joinedTitle: "{name} הצטרף/ה",
+      joinedBody: "{name} נמצא/ת עכשיו בשיחה הפרטית שלו/ה עם Bridge.",
+      joinedBodyMulti: "{names} נמצאים עכשיו בשיחות הפרטיות שלהם עם Bridge.",
+      dismiss: "סגירה",
+    },
   },
   intakeChat: {
     header: "להבין את הצד שלך",

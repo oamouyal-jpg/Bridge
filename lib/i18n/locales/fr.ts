@@ -216,6 +216,12 @@ export const fr: BridgeMessages = {
       startNewRoom: "Ouvrir une nouvelle salle",
     },
     summaryBtn: "Générer un résumé de session",
+    toast: {
+      joinedTitle: "{name} a rejoint",
+      joinedBody: "{name} est maintenant dans sa session privée avec Bridge.",
+      joinedBodyMulti: "{names} sont maintenant dans leurs sessions privées avec Bridge.",
+      dismiss: "Fermer",
+    },
   },
   intakeChat: {
     header: "Comprendre votre côté",
