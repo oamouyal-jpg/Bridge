@@ -32,6 +32,12 @@ export function useVoiceDictation(options: {
     setSupported(Boolean(getSpeechRecognition()));
   }, []);
 
+  /**
+   * Stop active recognition AND clear internal buffers. We must wipe
+   * `finalBuf`/`prefixRef` here: SpeechRecognition runs in `continuous` mode,
+   * so any late `onresult` fired after the user hits "send" would otherwise
+   * re-emit the just-sent text through `onText` and "un-clear" the draft.
+   */
   const stop = useCallback(() => {
     try {
       recRef.current?.stop();
@@ -39,6 +45,8 @@ export function useVoiceDictation(options: {
       /* ignore */
     }
     recRef.current = null;
+    finalBuf.current = "";
+    prefixRef.current = "";
     setListening(false);
   }, []);
 
@@ -64,6 +72,10 @@ export function useVoiceDictation(options: {
       recognition.interimResults = true;
 
       recognition.onresult = (event: SpeechRecognitionEvent) => {
+        // If the consumer called `stop()` (e.g. the user hit Send), ignore any
+        // late-arriving results the browser may still deliver — otherwise they
+        // would write the old text back into the now-cleared draft.
+        if (recRef.current !== recognition) return;
         let interim = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const r = event.results[i];

@@ -86,7 +86,7 @@ export function LandingHero() {
             <p className="mb-2 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-bridge-ink/70 lg:text-start">
               {t.hero.demoCaption}
             </p>
-            <div className="rounded-2xl border border-white/40 bg-white/20 p-2 shadow-lg backdrop-blur-xl sm:p-2.5">
+            <div className="rounded-2xl border border-white/65 bg-white/75 p-2 shadow-lg backdrop-blur-xl sm:p-2.5">
               <AppPreviewMock compact />
             </div>
           </aside>

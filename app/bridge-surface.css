@@ -41,16 +41,29 @@
 }
 
 /**
- * Copy that sits “in” the room: high blur, low-opacity fill so the photo reads through.
- * Use for hero columns, cards on marketing — not full-page white.
+ * Copy that sits "in" the room: soft-glass panels over photography.
+ *
+ * History: at 20% fill the photo still bled through and grey body copy
+ * (`text-bridge-stone`) blended into the background. We now run at ~0.86
+ * opaque cream so the panel still feels like glass (blur + border glow) but
+ * text is legible on any hero image. Browsers without `backdrop-filter` fall
+ * back to an even more opaque surface via `@supports not`.
  */
 .bridge-inroom-copy {
   border-radius: 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  background: rgba(255, 251, 247, 0.2);
-  box-shadow: 0 12px 40px -10px rgba(47, 40, 35, 0.12);
-  backdrop-filter: blur(22px) saturate(1.12);
-  -webkit-backdrop-filter: blur(22px) saturate(1.12);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 251, 247, 0.86);
+  box-shadow:
+    0 12px 40px -10px rgba(47, 40, 35, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .bridge-inroom-copy {
+    background: rgba(255, 251, 247, 0.96);
+  }
 }
 
 .bridge-sticky-header {

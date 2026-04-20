@@ -1,6 +1,7 @@
 "use client";
 
 import { Mic, MicOff } from "lucide-react";
+import { forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { useVoiceDictation } from "@/hooks/useVoiceDictation";
 import { cn } from "@/lib/utils";
@@ -15,12 +16,26 @@ type Props = {
 };
 
 /**
+ * Imperative handle exposed to callers (composer, intake) so they can stop
+ * dictation and wipe its internal buffers before clearing the draft. Without
+ * this, a late `onresult` event would restore the just-sent text.
+ */
+export type VoiceInputHandle = {
+  stopAndReset: () => void;
+};
+
+/**
  * Speak-to-text control: appends recognized speech to the current field (prefix = value at tap).
  */
-export function VoiceInputControl({ value, onChange, disabled, className, compact }: Props) {
+export const VoiceInputControl = forwardRef<VoiceInputHandle, Props>(function VoiceInputControl(
+  { value, onChange, disabled, className, compact },
+  ref
+) {
   const { supported, listening, voiceError, start, stop, setVoiceError } = useVoiceDictation({
     onText: onChange,
   });
+
+  useImperativeHandle(ref, () => ({ stopAndReset: stop }), [stop]);
 
   return (
     <div
@@ -69,4 +84,4 @@ export function VoiceInputControl({ value, onChange, disabled, className, compac
       {voiceError && <p className="text-xs text-red-700">{voiceError}</p>}
     </div>
   );
-}
+});

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { VoiceInputControl } from "@/components/VoiceInputControl";
+import { VoiceInputControl, type VoiceInputHandle } from "@/components/VoiceInputControl";
 import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 import type { IntakeMessage } from "@/lib/types";
 
@@ -25,6 +25,7 @@ export function IntakeChat({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const startedRef = useRef(false);
+  const voiceRef = useRef<VoiceInputHandle | null>(null);
 
   useEffect(() => {
     setMessages(initialMessages);
@@ -57,6 +58,10 @@ export function IntakeChat({
   async function send() {
     const text = input.trim();
     if (!text || busy) return;
+    // Stop voice dictation and clear the draft optimistically so the textbox
+    // empties the instant the user hits send — even while the AI is thinking.
+    voiceRef.current?.stopAndReset();
+    setInput("");
     setBusy(true);
     setError(null);
     try {
@@ -67,10 +72,11 @@ export function IntakeChat({
       });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Could not send.");
-      setInput("");
       await onUpdate();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not send.");
+      // On failure, restore what they typed so they don't lose it.
+      setInput(text);
     } finally {
       setBusy(false);
     }
@@ -112,6 +118,7 @@ export function IntakeChat({
             disabled={busy}
           />
           <VoiceInputControl
+            ref={voiceRef}
             className="sm:w-[min(260px,100%)] sm:shrink-0"
             value={input}
             onChange={setInput}

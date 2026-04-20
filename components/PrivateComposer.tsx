@@ -1,14 +1,14 @@
 "use client";
 
 import { Mic } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useRoomUiStore } from "@/stores/room-ui-store";
 import type { RealityCheckResult, TranslationMode } from "@/lib/types";
 import { TranslationModeSelector } from "./TranslationModeSelector";
-import { VoiceInputControl } from "./VoiceInputControl";
+import { VoiceInputControl, type VoiceInputHandle } from "./VoiceInputControl";
 import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 
 export function PrivateComposer({
@@ -36,6 +36,7 @@ export function PrivateComposer({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reality, setReality] = useState<RealityCheckResult | null>(null);
+  const voiceRef = useRef<VoiceInputHandle | null>(null);
 
   async function quickRewrite(kind: "clearer" | "gentler" | "deeper") {
     setBusy(true);
@@ -57,7 +58,13 @@ export function PrivateComposer({
   }
 
   async function send(confirmDespiteReality: boolean) {
-    if (!draft.trim() || busy || disabled || messageBlocked) return;
+    const text = draft.trim();
+    if (!text || busy || disabled || messageBlocked) return;
+    // Optimistic clear + stop voice so late `onresult` events can't write the
+    // sent message back into the box. We restore the draft only if something
+    // goes wrong or the AI wants us to pause (reality check, safety, limit).
+    voiceRef.current?.stopAndReset();
+    setDraft("");
     setBusy(true);
     setError(null);
     try {
@@ -66,7 +73,7 @@ export function PrivateComposer({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           participantId,
-          content: draft,
+          content: text,
           translationMode,
           confirmDespiteReality,
           skipRealityCheck: false,
@@ -84,25 +91,29 @@ export function PrivateComposer({
       if (res.status === 402 && data.code === "MESSAGE_LIMIT") {
         onMessageBlocked?.();
         setError(t.composer.messageBlocked);
+        setDraft(text);
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Could not send.");
 
       if (data.ok === false && data.phase === "safety") {
         setError(data.safety?.userMessage ?? "Safety pause — please revise or seek human support.");
+        setDraft(text);
         return;
       }
 
       if (data.phase === "reality_check" && data.realityCheck) {
+        // Put the draft back so the user can revise it with the reality prompts.
+        setDraft(text);
         setReality(data.realityCheck);
         return;
       }
 
       setReality(null);
-      setDraft("");
       await onSent();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Send failed.");
+      setDraft(text);
     } finally {
       setBusy(false);
     }
@@ -142,6 +153,7 @@ export function PrivateComposer({
             disabled={busy || disabled || messageBlocked}
           />
           <VoiceInputControl
+            ref={voiceRef}
             className="lg:w-[min(280px,100%)] lg:shrink-0"
             value={draft}
             onChange={setDraft}

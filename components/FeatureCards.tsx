@@ -78,9 +78,9 @@ export function FeatureCards() {
           {pillars.map((it) => (
             <Card
               key={it.title}
-              className="bridge-card flex flex-col overflow-hidden border border-white/45 bg-white/25 shadow-lg backdrop-blur-xl transition-shadow hover:shadow-xl"
+              className="bridge-card flex flex-col overflow-hidden border border-white/70 bg-white/85 shadow-lg backdrop-blur-xl transition-shadow hover:shadow-xl"
             >
-              <div className="border-b border-white/35 bg-white/20 px-5 py-4 backdrop-blur-sm">
+              <div className="border-b border-white/60 bg-white/55 px-5 py-4 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-bridge-mist/80">
                     <it.icon className="h-5 w-5 text-bridge-sage" aria-hidden />
@@ -135,7 +135,7 @@ export function FeatureCards() {
                 </Button>
               </div>
             </div>
-            <div className="rounded-2xl border border-white/40 bg-white/20 p-6 shadow-inner backdrop-blur-md lg:p-8">
+            <div className="rounded-2xl border border-white/60 bg-white/75 p-6 shadow-inner backdrop-blur-md lg:p-8">
               <p className="text-xs font-semibold tracking-wide text-bridge-sageMuted">{f.spaceTitle}</p>
               <ul className="mt-5 space-y-3 text-sm text-bridge-ink">
                 <li className="flex items-start gap-2">
