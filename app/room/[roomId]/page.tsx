@@ -67,6 +67,8 @@ export default function RoomPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [paywallProduct, setPaywallProduct] = useState<PaymentProductType | null>(null);
+  // Insights/monetization are tucked away by default so the chat UI is not cluttered.
+  const [showOptions, setShowOptions] = useState(false);
 
   /**
    * Session comes from localStorage so we MUST NOT read it during SSR or the
@@ -452,46 +454,87 @@ export default function RoomPage() {
       )}
 
       {(room.status === "active" || room.status === "paused") && (
-        <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
-          {data.riskState && (
-            <SafetySignalsBanner risk={data.riskState} />
-          )}
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1fr)]">
-          <div className="space-y-4 lg:col-span-1">
-            <MonetizationPanel
-              roomId={rawId}
-              participantId={myId}
-              sharedCount={data.sharedMessages?.length ?? 0}
-              riskLevel={data.riskState?.level}
-              credits={credits}
-              entitlements={entitlements}
-              isBusiness={isBusinessRoom}
-              messagesRemaining={msgsLeft ?? null}
-              resolutionOutputs={resolutionOutputs}
-              latestInsightReport={data.latestInsightReport}
-              freeMode={data.freeMode ?? false}
-              onPaywall={(p) => setPaywallProduct(p)}
-              onRefresh={refresh}
-            />
-            <PrivateComposer
-              roomId={rawId}
-              participantId={myId}
-              messageBlocked={atMessageLimit}
-              onMessageBlocked={() => setPaywallProduct("extend_session")}
-              onSent={refresh}
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <SharedThread
-              roomId={rawId}
-              viewerParticipantId={myId}
-              messages={data.sharedMessages ?? []}
-              participants={participants}
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <InsightPanel cards={data.myInsights ?? []} />
-          </div>
+        <div className="mx-auto max-w-6xl space-y-4 px-4 py-6">
+          {data.riskState && <SafetySignalsBanner risk={data.riskState} />}
+
+          {/* Orientation banner: tells people exactly what this page is doing. */}
+          <Card className="border-bridge-sage/30 bg-bridge-mist/40">
+            <CardContent className="flex flex-col gap-1 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sage">
+                  {t.room.sharedSession.title}
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-bridge-ink">
+                  {t.room.sharedSession.subtitle}
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  className="rounded-full"
+                  onClick={() => setShowOptions((v) => !v)}
+                  aria-expanded={showOptions}
+                >
+                  {showOptions
+                    ? t.room.sharedSession.lessOptions
+                    : t.room.sharedSession.moreOptions}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() =>
+                    void generateSummary().catch((e) => alert(e.message))
+                  }
+                >
+                  {t.room.summaryBtn}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            {/* Main column: thread first, composer below. Classic chat ordering. */}
+            <div className="order-1 space-y-4">
+              <SharedThread
+                roomId={rawId}
+                viewerParticipantId={myId}
+                messages={data.sharedMessages ?? []}
+                participants={participants}
+              />
+              <PrivateComposer
+                roomId={rawId}
+                participantId={myId}
+                messageBlocked={atMessageLimit}
+                onMessageBlocked={() => setPaywallProduct("extend_session")}
+                onSent={refresh}
+              />
+            </div>
+
+            {/* Side column: collapsed by default so the chat isn't cluttered. */}
+            {showOptions && (
+              <aside className="order-2 space-y-4">
+                <MonetizationPanel
+                  roomId={rawId}
+                  participantId={myId}
+                  sharedCount={data.sharedMessages?.length ?? 0}
+                  riskLevel={data.riskState?.level}
+                  credits={credits}
+                  entitlements={entitlements}
+                  isBusiness={isBusinessRoom}
+                  messagesRemaining={msgsLeft ?? null}
+                  resolutionOutputs={resolutionOutputs}
+                  latestInsightReport={data.latestInsightReport}
+                  freeMode={data.freeMode ?? false}
+                  onPaywall={(p) => setPaywallProduct(p)}
+                  onRefresh={refresh}
+                />
+                <InsightPanel cards={data.myInsights ?? []} />
+              </aside>
+            )}
           </div>
         </div>
       )}
@@ -535,18 +578,6 @@ export default function RoomPage() {
         </div>
       )}
 
-      {(room.status === "active" || room.status === "paused") && (
-        <div className="mx-auto max-w-3xl px-4 pb-16">
-          <Button
-            variant="secondary"
-            className="rounded-full"
-            type="button"
-            onClick={() => void generateSummary().catch((e) => alert(e.message))}
-          >
-            {t.room.summaryBtn}
-          </Button>
-        </div>
-      )}
     </main>
     </WarmPageFrame>
   );

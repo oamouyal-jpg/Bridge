@@ -404,62 +404,46 @@ export function PrivateComposer({
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            className="rounded-full"
-            disabled={busy || disabled}
-            onClick={() => void quickRewrite("clearer")}
-          >
-            {t.composer.sayMoreClearly}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            className="rounded-full"
-            disabled={busy || disabled}
-            onClick={() => void quickRewrite("gentler")}
-          >
-            {t.composer.sayMoreGently}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            className="rounded-full"
-            disabled={busy || disabled}
-            onClick={() => void quickRewrite("deeper")}
-          >
-            {t.composer.sayWhatIMean}
-          </Button>
-        </div>
-
-        <div className="flex flex-wrap gap-2 border-t border-bridge-mist pt-3">
-          <Button
-            type="button"
-            className="rounded-full"
-            disabled={busy || disabled || Boolean(preview)}
-            onClick={() => void requestPreview(false)}
-          >
-            {busy ? t.composer.sending : t.composer.send}
-          </Button>
-        </div>
-
-        <div className="flex flex-wrap gap-2 text-[11px] text-bridge-stone">
-          <span className="font-medium text-bridge-ink">{t.composer.fairnessHelpers}</span>
-          <button type="button" className="underline" onClick={() => void quickRewrite("gentler")}>
-            {t.composer.makeFairer}
-          </button>
-          <button type="button" className="underline" onClick={() => void quickRewrite("clearer")}>
-            {t.composer.separateFactFeeling}
-          </button>
-          <button type="button" className="underline" onClick={() => void quickRewrite("deeper")}>
-            {t.composer.addAccountability}
-          </button>
-        </div>
+        {/* Primary action directly below the text area; quick rewrites are secondary. */}
+        {!preview && (
+          <div className="flex flex-wrap items-center gap-2 border-t border-bridge-mist pt-3">
+            <Button
+              type="button"
+              className="rounded-full"
+              disabled={busy || disabled || !draft.trim()}
+              onClick={() => void requestPreview(false)}
+            >
+              {busy ? t.composer.sending : t.composer.send}
+            </Button>
+            <span className="text-[11px] text-bridge-stone">
+              {t.composer.fairnessHelpers}
+            </span>
+            <button
+              type="button"
+              className="text-[11px] text-bridge-sage underline"
+              disabled={busy || disabled || !draft.trim()}
+              onClick={() => void quickRewrite("clearer")}
+            >
+              {t.composer.sayMoreClearly}
+            </button>
+            <button
+              type="button"
+              className="text-[11px] text-bridge-sage underline"
+              disabled={busy || disabled || !draft.trim()}
+              onClick={() => void quickRewrite("gentler")}
+            >
+              {t.composer.sayMoreGently}
+            </button>
+            <button
+              type="button"
+              className="text-[11px] text-bridge-sage underline"
+              disabled={busy || disabled || !draft.trim()}
+              onClick={() => void quickRewrite("deeper")}
+            >
+              {t.composer.sayWhatIMean}
+            </button>
+          </div>
+        )}
 
         {error && <p className="text-sm text-red-700">{error}</p>}
       </CardContent>

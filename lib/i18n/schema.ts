@@ -167,6 +167,18 @@ export type BridgeMessages = {
       lineEveryone: string;
       begin: string;
     };
+    /** One-line orientation shown above the shared chat while it's active. */
+    sharedSession: {
+      /** e.g. "Shared session" */
+      title: string;
+      /** Short sentence: everything you write passes through the mediator. */
+      subtitle: string;
+      /** Toggle label for showing/hiding insights and upgrades. */
+      moreOptions: string;
+      lessOptions: string;
+      /** Shown when the other side hasn't sent anything yet. */
+      waitingForOther: string;
+    };
     debrief: {
       title: string;
       whatEachSideNeeds: string;

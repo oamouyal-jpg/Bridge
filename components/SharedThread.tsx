@@ -79,16 +79,21 @@ export function SharedThread({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sageMuted">
-        {t.sharedThread.heading}
-      </p>
-      <div className="max-h-[min(70vh,720px)] space-y-3 overflow-y-auto pr-1">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sageMuted">
+          {t.sharedThread.heading}
+        </p>
+        <span className="text-[11px] text-bridge-stone">
+          {messages.length === 0
+            ? ""
+            : `${messages.length} ${messages.length === 1 ? "message" : "messages"}`}
+        </span>
+      </div>
+      <div className="max-h-[min(60vh,560px)] min-h-[220px] space-y-3 overflow-y-auto rounded-xl border border-bridge-mist bg-white/60 p-3">
         {messages.length === 0 && (
-          <Card className="border-dashed border-bridge-mist bg-white">
-            <CardContent className="p-4 text-sm text-bridge-stone">
-              {t.sharedThread.emptyBody}
-            </CardContent>
-          </Card>
+          <div className="flex h-full min-h-[180px] items-center justify-center px-4 text-center text-sm leading-relaxed text-bridge-stone">
+            {t.room.sharedSession.waitingForOther}
+          </div>
         )}
         {messages.map((m) => {
           const isFromOther = m.sourceParticipantId !== viewerParticipantId;

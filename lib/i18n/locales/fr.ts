@@ -217,6 +217,15 @@ export const fr: BridgeMessages = {
         "Bridge a assez de contexte de chacun·e dans la salle pour commencer la communication médiée.",
       begin: "Commencer la médiation",
     },
+    sharedSession: {
+      title: "Session partagée",
+      subtitle:
+        "Tout ce que vous écrivez passe par le médiateur avant que l'autre ne le voie. Vous verrez un aperçu et pourrez modifier ou envoyer tel quel.",
+      moreOptions: "Afficher les aperçus et options",
+      lessOptions: "Masquer les aperçus et options",
+      waitingForOther:
+        "Pas encore de messages. Écrivez ce que vous voulez qu'iel comprenne — le médiateur le reformulera avant qu'iel ne le voie.",
+    },
     debrief: {
       title: "Débriefing de la session",
       whatEachSideNeeds: "Ce dont chaque côté semble avoir besoin",
