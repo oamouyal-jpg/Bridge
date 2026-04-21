@@ -89,7 +89,7 @@ export function SharedThread({
             : `${messages.length} ${messages.length === 1 ? "message" : "messages"}`}
         </span>
       </div>
-      <div className="max-h-[min(60vh,560px)] min-h-[220px] space-y-3 overflow-y-auto rounded-xl border border-bridge-mist bg-white/60 p-3">
+      <div className="max-h-[min(60vh,560px)] min-h-[220px] space-y-3 overflow-y-auto rounded-xl border border-bridge-mist bg-white p-3">
         {messages.length === 0 && (
           <div className="flex h-full min-h-[180px] items-center justify-center px-4 text-center text-sm leading-relaxed text-bridge-stone">
             {t.room.sharedSession.waitingForOther}

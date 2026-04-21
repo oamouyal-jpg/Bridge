@@ -118,7 +118,7 @@ export function IntakeChat({
         </div>
         <div
           ref={scrollRef}
-          className="max-h-[55vh] min-h-[180px] space-y-3 overflow-y-auto rounded-xl border border-bridge-mist bg-bridge-cream/40 p-3 sm:max-h-[420px]"
+          className="max-h-[55vh] min-h-[180px] space-y-3 overflow-y-auto rounded-xl border border-bridge-mist bg-white p-3 sm:max-h-[420px]"
         >
           {messages.map((m) => (
             <div

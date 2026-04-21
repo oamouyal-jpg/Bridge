@@ -458,7 +458,7 @@ export default function RoomPage() {
           {data.riskState && <SafetySignalsBanner risk={data.riskState} />}
 
           {/* Orientation banner: tells people exactly what this page is doing. */}
-          <Card className="border-bridge-sage/30 bg-bridge-mist/40">
+          <Card className="border-bridge-sage/30 bg-white">
             <CardContent className="flex flex-col gap-1 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sage">

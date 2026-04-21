@@ -218,13 +218,13 @@ export const fr: BridgeMessages = {
       begin: "Commencer la médiation",
     },
     sharedSession: {
-      title: "Session partagée",
+      title: "Vous êtes dans le chat partagé",
       subtitle:
-        "Tout ce que vous écrivez passe par le médiateur avant que l'autre ne le voie. Vous verrez un aperçu et pourrez modifier ou envoyer tel quel.",
-      moreOptions: "Afficher les aperçus et options",
-      lessOptions: "Masquer les aperçus et options",
+        "Écrivez ce que vous voulez dire. On le reformule pour que ça passe mieux, puis vous choisissez ce qui part.",
+      moreOptions: "Plus",
+      lessOptions: "Masquer",
       waitingForOther:
-        "Pas encore de messages. Écrivez ce que vous voulez qu'iel comprenne — le médiateur le reformulera avant qu'iel ne le voie.",
+        "Pas encore de messages. Allez-y — écrivez ce que vous voulez qu'iel comprenne.",
     },
     debrief: {
       title: "Débriefing de la session",

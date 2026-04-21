@@ -144,8 +144,10 @@ export function PrivateComposer({
   }
 
   /**
-   * Second phase: commit the previewed (optionally edited) message OR the
-   * sender's own wording. Safety check still runs server-side on the raw.
+   * Second phase: commit the previewed (optionally edited) message. The
+   * raw "sender_original" delivery mode is intentionally not exposed in
+   * the UI — the whole product promise is that the other side sees the
+   * mediated version, not the sender's raw wording.
    */
   async function commit(mode: "mediated" | "mediated_edited" | "sender_original") {
     if (!preview || busy) return;
@@ -200,15 +202,6 @@ export function PrivateComposer({
   function cancelPreview() {
     setPreview(null);
     setEditingPreview(false);
-  }
-
-  async function handleSendOriginal() {
-    if (!preview) return;
-    if (typeof window !== "undefined") {
-      const ok = window.confirm(t.composer.sendOriginalConfirm);
-      if (!ok) return;
-    }
-    await commit("sender_original");
   }
 
   return (
@@ -268,16 +261,6 @@ export function PrivateComposer({
               <Button
                 type="button"
                 size="sm"
-                variant="secondary"
-                className="rounded-full"
-                disabled={busy}
-                onClick={() => void requestPreview(true)}
-              >
-                {t.composer.sendAsIs}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
                 className="rounded-full"
                 disabled={busy}
                 onClick={() => void quickRewrite("clearer")}
@@ -294,12 +277,22 @@ export function PrivateComposer({
               >
                 {t.composer.addEvidence}
               </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="rounded-full"
+                disabled={busy}
+                onClick={() => void requestPreview(true)}
+              >
+                {t.composer.sendAsIs}
+              </Button>
             </div>
           </div>
         )}
 
         {preview && (
-          <div className="space-y-3 rounded-xl border border-bridge-sage/30 bg-bridge-mist/40 p-4 text-sm text-bridge-ink">
+          <div className="space-y-3 rounded-xl border border-bridge-sage/30 bg-bridge-mist p-4 text-sm text-bridge-ink">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sageMuted">
                 {t.composer.previewHeader}
@@ -307,7 +300,7 @@ export function PrivateComposer({
               <p className="mt-1 text-xs text-bridge-stone">{t.composer.previewBlurb}</p>
             </div>
 
-            <div className="rounded-lg border border-bridge-mist bg-white/70 p-3">
+            <div className="rounded-lg border border-bridge-mist bg-white p-3">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-bridge-stone">
                 {t.composer.yourDraftLabel}
               </p>
@@ -380,16 +373,6 @@ export function PrivateComposer({
                   {t.composer.editMediated}
                 </Button>
               )}
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="rounded-full"
-                disabled={busy}
-                onClick={() => void handleSendOriginal()}
-              >
-                {t.composer.sendOriginal}
-              </Button>
               <Button
                 type="button"
                 size="sm"
