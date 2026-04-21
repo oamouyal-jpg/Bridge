@@ -61,28 +61,48 @@ export interface BridgeStore {
 
 let activeStore: BridgeStore | null = null;
 
+function loadMemoryStore(): BridgeStore {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mod = require("./stores/memory-store") as typeof import("./stores/memory-store");
+  return mod.memoryStore;
+}
+
 function selectStore(): BridgeStore {
   if (activeStore) return activeStore;
 
   const dbPath = process.env.BRIDGE_DB_PATH?.trim();
   if (dbPath) {
-    /**
-     * Lazy-require the sqlite implementation so local dev / serverless edge
-     * builds that never set `BRIDGE_DB_PATH` don't have to load the native
-     * `better-sqlite3` binding at all.
-     */
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require("./stores/sqlite-store") as typeof import("./stores/sqlite-store");
-    activeStore = mod.createSqliteStore(dbPath);
-    if (process.env.NODE_ENV !== "test") {
-      console.log(`[bridge] using SQLite store at ${dbPath}`);
+    try {
+      /**
+       * Lazy-require the sqlite implementation so local dev / serverless edge
+       * builds that never set `BRIDGE_DB_PATH` don't have to load the native
+       * `better-sqlite3` binding at all.
+       */
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mod = require("./stores/sqlite-store") as typeof import("./stores/sqlite-store");
+      activeStore = mod.createSqliteStore(dbPath);
+      if (process.env.NODE_ENV !== "test") {
+        console.log(`[bridge] using SQLite store at ${dbPath}`);
+      }
+      return activeStore;
+    } catch (err) {
+      /**
+       * If SQLite can't open (e.g. the persistent disk isn't actually mounted
+       * at BRIDGE_DB_PATH yet), we DO NOT want to make every API call throw
+       * forever. Fall back to the in-memory store so the site keeps working
+       * for the duration of this process. Shout loudly so the operator sees
+       * the misconfiguration in the logs.
+       */
+      console.error(
+        "[bridge] SQLite init FAILED — falling back to in-memory store. Data will not persist across restarts. Original error:",
+        err
+      );
+      activeStore = loadMemoryStore();
+      return activeStore;
     }
-    return activeStore;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require("./stores/memory-store") as typeof import("./stores/memory-store");
-  activeStore = mod.memoryStore;
+  activeStore = loadMemoryStore();
   if (process.env.NODE_ENV !== "test") {
     console.warn(
       "[bridge] using IN-MEMORY store — data will NOT persist across restarts. Set BRIDGE_DB_PATH to enable SQLite."

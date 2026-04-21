@@ -72,6 +72,10 @@ export function createRoom(input: {
   aggregate.participants.set(participantId, participant);
   saveRoomAggregate(aggregate);
 
+  console.log(
+    `[bridge] room created id=${roomId} inviteCode=${inviteCode} category=${input.category}`
+  );
+
   return { room, participant, aggregate };
 }
 
@@ -79,11 +83,22 @@ export function joinRoom(input: {
   inviteCode: string;
   displayName: string;
 }): { room: Room; participant: Participant; aggregate: RoomAggregate } {
-  const roomId = resolveRoomIdFromCode(input.inviteCode);
-  if (!roomId) throw new Error("Room not found.");
+  const normalized = input.inviteCode.trim().toLowerCase();
+  const roomId = resolveRoomIdFromCode(normalized);
+  if (!roomId) {
+    console.warn(
+      `[bridge] join failed: inviteCode="${normalized}" not found in store`
+    );
+    throw new Error("Room not found.");
+  }
 
   const aggregate = getOrCreateAggregate(roomId);
-  if (!aggregate) throw new Error("Room not found.");
+  if (!aggregate) {
+    console.warn(
+      `[bridge] join failed: roomId=${roomId} resolved from code="${normalized}" but aggregate missing`
+    );
+    throw new Error("Room not found.");
+  }
 
   const cap = aggregate.room.maxParticipants ?? 2;
   if (aggregate.participants.size >= cap) {
