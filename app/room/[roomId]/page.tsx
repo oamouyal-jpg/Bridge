@@ -382,21 +382,9 @@ export default function RoomPage() {
                   <p className="mt-1 text-sm leading-relaxed text-bridge-stone">
                     {t.room.intake.shareNowBody}
                   </p>
-                </div>
-                <div className="rounded-xl border border-bridge-mist bg-white/80 px-4 py-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-bridge-sageMuted">
-                    {t.room.intake.codeLabel}
+                  <p className="mt-1 text-xs font-medium text-bridge-sage">
+                    {t.room.intake.noInstallNote}
                   </p>
-                  <p className="mt-1 font-mono text-2xl tracking-wide text-bridge-ink">
-                    {room.inviteCode}
-                  </p>
-                  {joinCap > 2 && (
-                    <p className="mt-1 text-xs text-bridge-stone">
-                      {t.room.intake.joinedCountSuffix
-                        .replace("{n}", String(participants.length))
-                        .replace("{cap}", String(joinCap))}
-                    </p>
-                  )}
                 </div>
                 <ShareInviteLinks
                   inviteCode={room.inviteCode}
@@ -404,6 +392,13 @@ export default function RoomPage() {
                   maxParticipants={joinCap}
                   variant="full"
                 />
+                {joinCap > 2 && (
+                  <p className="text-xs text-bridge-stone">
+                    {t.room.intake.joinedCountSuffix
+                      .replace("{n}", String(participants.length))
+                      .replace("{cap}", String(joinCap))}
+                  </p>
+                )}
               </CardContent>
             </Card>
           )}

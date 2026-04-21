@@ -47,29 +47,34 @@ export function inviteShareMessage(opts: {
     ? `I opened a Bridge room (“${title}”) — a calmer way for us to talk (private first, then together when we’re ready).`
     : `I opened a Bridge room — a calmer way for us to talk (private first, then together when we’re ready).`;
 
-  let downloadBlock = "";
-  try {
-    const origin = new URL(opts.joinUrl).origin;
-    const downloadUrl = bridgeDownloadPageUrl(origin);
-    const stores = nativeStoreLinkLines();
-    downloadBlock = `\n\nGet the Bridge app (or use Bridge in your browser): ${downloadUrl}${stores}`;
-  } catch {
-    /* joinUrl must be absolute for share flows */
-  }
-
   const cap = opts.maxParticipants ?? 2;
   const flow =
     cap <= 2
-      ? "Bridge is built for two people at a time: you each speak privately first, then you share a mediated thread — couples, family, or colleagues."
-      : `This Bridge room has up to ${cap} seats: everyone gets a private intake first, then you share one mediated thread — useful for family or small team check-ins.`;
+      ? "Bridge is built for two people at a time: you each speak privately first, then share a mediated thread. Couples, family, or colleagues."
+      : `This Bridge room has up to ${cap} seats: everyone does a private intake first, then shares one mediated thread — useful for family or small team check-ins.`;
+
+  // Optional: if a native store URL is configured, include it as an extra
+  // option for users who'd rather install a wrapper app later. The web link
+  // above is always the primary path — there's nothing to install.
+  const stores = nativeStoreLinkLines();
+  const storesBlock = stores ? `\n\nPrefer a phone app?${stores}` : "";
+
+  let manualFallback = `enter code ${opts.inviteCode}`;
+  try {
+    const origin = new URL(opts.joinUrl).origin;
+    manualFallback = `go to ${origin}/join and enter code ${opts.inviteCode}`;
+  } catch {
+    /* joinUrl should be absolute, but don't crash the share if it isn't */
+  }
 
   return `${head}
 
-Tap to join (your code is filled in): ${opts.joinUrl}
+Tap this link to join — it opens right in your browser, nothing to install:
+${opts.joinUrl}
 
-Invite code: ${opts.inviteCode}
+(If the link doesn't open, ${manualFallback}.)
 
-${flow}${downloadBlock}`;
+${flow}${storesBlock}`;
 }
 
 export function appShareMessage(appUrl: string): string {

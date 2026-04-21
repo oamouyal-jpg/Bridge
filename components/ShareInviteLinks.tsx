@@ -93,32 +93,30 @@ export function ShareInviteLinks({
       <p className="text-xs font-medium uppercase tracking-wide text-bridge-sageMuted">
         Send a link
       </p>
-      <div className="rounded-xl border border-bridge-mist bg-bridge-cream/40 p-3 text-xs">
+      <div className="rounded-xl border border-bridge-mist bg-bridge-cream/40 p-4 text-xs">
         <p className="font-medium uppercase tracking-wide text-bridge-sageMuted">
-          Invite code
+          Join link
+        </p>
+        <button
+          type="button"
+          onClick={() => void copy(joinUrl, "link")}
+          className="mt-1 block w-full select-all break-all text-left font-mono text-sm font-medium text-bridge-ink underline underline-offset-4 hover:text-bridge-sage"
+          aria-label="Copy join link"
+          title="Tap to copy — opens Bridge in any browser"
+        >
+          {joinUrl}
+        </button>
+        <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-bridge-sageMuted">
+          Or share the short code
         </p>
         <button
           type="button"
           onClick={() => void copy(inviteCode, "code")}
-          className="mt-1 block w-full select-all break-all text-left font-mono text-base text-bridge-ink underline-offset-4 hover:underline"
+          className="mt-1 block select-all text-left font-mono text-lg tracking-wide text-bridge-ink underline-offset-4 hover:underline"
           aria-label="Copy invite code"
         >
           {inviteCode}
         </button>
-        <p className="mt-2 font-medium uppercase tracking-wide text-bridge-sageMuted">
-          Join link
-        </p>
-        <a
-          href={joinUrl}
-          className="mt-1 block select-all break-all font-mono text-[11px] text-bridge-ink underline underline-offset-2 hover:text-bridge-sage"
-          onClick={(e) => {
-            if (e.metaKey || e.ctrlKey || e.button !== 0) return;
-            e.preventDefault();
-            void copy(joinUrl, "link");
-          }}
-        >
-          {joinUrl}
-        </a>
       </div>
       <div
         className={

@@ -151,6 +151,10 @@ export type BridgeMessages = {
       /** Short directive sentence that tells the creator to share the code now. */
       shareNowBody: string;
       codeLabel: string;
+      /** Label above the full tap-to-join URL (the primary share artifact). */
+      linkLabel: string;
+      /** Reassurance under the link that no install is needed. */
+      noInstallNote: string;
       /** Use `{n}` and `{cap}` placeholders. */
       joinedCountSuffix: string;
       copyCode: string;
