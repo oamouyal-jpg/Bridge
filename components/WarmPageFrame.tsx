@@ -14,14 +14,17 @@ export function WarmPageFrame({
   children: ReactNode;
   className?: string;
   emphasis?: "default" | "soft";
-  contentVeil?: "light" | "medium" | "none";
+  /** `solid` = opaque cream (best readability over the photo, e.g. room pages). */
+  contentVeil?: "light" | "medium" | "none" | "solid";
 }) {
   const veil =
     contentVeil === "none"
       ? "bg-transparent"
-      : contentVeil === "light"
-        ? "bg-bridge-cream/35"
-        : "bg-bridge-cream/52";
+      : contentVeil === "solid"
+        ? "bg-bridge-cream"
+        : contentVeil === "light"
+          ? "bg-bridge-cream/35"
+          : "bg-bridge-cream/52";
   return (
     <div className={cn("relative min-h-screen", className)}>
       <AmbientBackdrop emphasis={emphasis} />

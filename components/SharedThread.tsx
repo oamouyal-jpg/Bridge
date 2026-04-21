@@ -80,10 +80,10 @@ export function SharedThread({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sageMuted">
+        <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sage">
           {t.sharedThread.heading}
         </p>
-        <span className="text-[11px] text-bridge-stone">
+        <span className="text-[11px] font-medium text-bridge-ink">
           {messages.length === 0
             ? ""
             : `${messages.length} ${messages.length === 1 ? "message" : "messages"}`}
@@ -91,7 +91,7 @@ export function SharedThread({
       </div>
       <div className="max-h-[min(60vh,560px)] min-h-[220px] space-y-3 overflow-y-auto rounded-xl border border-bridge-mist bg-white p-3">
         {messages.length === 0 && (
-          <div className="flex h-full min-h-[180px] items-center justify-center px-4 text-center text-sm leading-relaxed text-bridge-stone">
+          <div className="flex h-full min-h-[180px] items-center justify-center px-4 text-center text-sm leading-relaxed text-bridge-ink">
             {t.room.sharedSession.waitingForOther}
           </div>
         )}
@@ -102,7 +102,7 @@ export function SharedThread({
           return (
             <Card key={m.id} className="border-bridge-mist bg-white">
               <CardContent className="space-y-2 p-4">
-                <div className="flex items-center justify-between gap-2 text-xs text-bridge-stone">
+                <div className="flex items-center justify-between gap-2 text-xs text-bridge-clay">
                   <span className="font-medium text-bridge-ink">
                     From {names[m.sourceParticipantId] ?? "Participant"}
                   </span>
@@ -114,13 +114,13 @@ export function SharedThread({
                     className={
                       m.deliveryMode === "sender_original"
                         ? "rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 font-medium text-amber-800"
-                        : "rounded-full border border-bridge-sage/30 bg-bridge-mist/40 px-2 py-0.5 font-medium text-bridge-sageMuted"
+                        : "rounded-full border border-bridge-sage/40 bg-bridge-mist px-2 py-0.5 font-medium text-bridge-sage"
                     }
                   >
                     {deliveryLabel(m.deliveryMode)}
                   </span>
                   {m.detectedIntent && (
-                    <span className="text-bridge-sageMuted">
+                    <span className="text-bridge-clay">
                       {t.sharedThread.intentLabel}: {m.detectedIntent}
                     </span>
                   )}
@@ -129,7 +129,7 @@ export function SharedThread({
                       type="button"
                       size="sm"
                       variant="ghost"
-                      className="ml-auto rounded-full px-3 py-0 text-[11px] text-bridge-sage hover:text-bridge-sageMuted"
+                      className="ml-auto rounded-full px-3 py-0 text-[11px] font-medium text-bridge-ink hover:text-bridge-sage"
                       onClick={() => void loadPerspective(m.id)}
                     >
                       {t.sharedThread.readWithContext}
@@ -138,28 +138,28 @@ export function SharedThread({
                 </div>
 
                 {isFromOther && open && (
-                  <div className="mt-2 rounded-lg border border-bridge-sage/30 bg-bridge-mist/40 p-3 text-xs leading-relaxed text-bridge-ink">
+                  <div className="mt-2 rounded-lg border border-bridge-sage/40 bg-bridge-sand p-3 text-xs leading-relaxed text-bridge-ink">
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-semibold text-bridge-sage">
                         {t.sharedThread.contextHeading}
                       </p>
                       <button
                         type="button"
-                        className="text-[11px] text-bridge-stone underline"
+                        className="text-[11px] font-medium text-bridge-ink underline"
                         onClick={() => setOpenId(null)}
                       >
                         {t.sharedThread.contextClose}
                       </button>
                     </div>
                     {!perspective || perspective.status === "loading" ? (
-                      <p className="mt-2 text-bridge-stone">{t.sharedThread.contextLoading}</p>
+                      <p className="mt-2 text-bridge-clay">{t.sharedThread.contextLoading}</p>
                     ) : perspective.status === "error" ? (
                       <p className="mt-2 text-red-700">{perspective.message}</p>
                     ) : (
-                      <div className="mt-2 space-y-2 text-bridge-stone">
+                      <div className="mt-2 space-y-2 text-bridge-ink">
                         <p>{perspective.data.underneath}</p>
                         <p>{perspective.data.likelyNeed}</p>
-                        <p className="italic text-bridge-ink">{perspective.data.suggestion}</p>
+                        <p className="italic text-bridge-clay">{perspective.data.suggestion}</p>
                       </div>
                     )}
                   </div>

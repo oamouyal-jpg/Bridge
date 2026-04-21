@@ -20,7 +20,7 @@ export function TranslationModeSelector({
 }) {
   return (
     <div>
-      <p className="text-xs font-medium uppercase tracking-wide text-bridge-sageMuted">
+      <p className="text-xs font-medium uppercase tracking-wide text-bridge-sage">
         Translation mode
       </p>
       <div className="mt-2 flex flex-wrap gap-2">
@@ -34,12 +34,19 @@ export function TranslationModeSelector({
               "rounded-full border px-3 py-1.5 text-left text-xs transition",
               value === m.id
                 ? "border-bridge-ink bg-bridge-ink text-bridge-cream"
-                : "border-bridge-mist bg-white text-bridge-stone hover:border-bridge-sageMuted",
+                : "border-bridge-mist bg-white text-bridge-ink hover:border-bridge-sage",
               disabled && "opacity-50"
             )}
           >
             <span className="block font-medium">{m.label}</span>
-            <span className="block text-[10px] opacity-80">{m.hint}</span>
+            <span
+              className={cn(
+                "block text-[10px]",
+                value === m.id ? "text-bridge-cream/95" : "text-bridge-clay"
+              )}
+            >
+              {m.hint}
+            </span>
           </button>
         ))}
       </div>

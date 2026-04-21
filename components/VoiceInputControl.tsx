@@ -59,7 +59,7 @@ export const VoiceInputControl = forwardRef<VoiceInputHandle, Props>(function Vo
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 rounded-2xl border border-bridge-mist bg-bridge-sand/40 p-3 sm:p-4",
+        "flex flex-col gap-2 rounded-2xl border border-bridge-mist bg-bridge-sand p-3 sm:p-4",
         className
       )}
     >
@@ -82,7 +82,7 @@ export const VoiceInputControl = forwardRef<VoiceInputHandle, Props>(function Vo
         >
           {listening ? <MicOff className="h-5 w-5" aria-hidden /> : <Mic className="h-5 w-5" aria-hidden />}
         </Button>
-        <div className="min-w-0 flex-1 text-xs leading-snug text-bridge-stone">
+        <div className="min-w-0 flex-1 text-xs leading-snug text-bridge-ink">
           {!supported ? (
             <span className="text-bridge-warn">
               Voice typing needs Chrome, Edge, or Safari 16.4+.

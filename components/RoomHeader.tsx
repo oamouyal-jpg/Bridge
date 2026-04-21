@@ -45,16 +45,16 @@ export function RoomHeader({
   }
 
   return (
-    <header className="flex flex-col gap-4 border-b border-bridge-mist/80 bg-gradient-to-r from-white via-bridge-honey/35 to-bridge-peach/15 px-4 py-4 shadow-sm backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
+    <header className="flex flex-col gap-4 border-b border-bridge-mist bg-bridge-cream px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p className="text-xs font-medium tracking-wide text-bridge-sageMuted">{t.room.header.yourRoom}</p>
+        <p className="text-xs font-medium tracking-wide text-bridge-sage">{t.room.header.yourRoom}</p>
         <h1 className="font-display text-xl text-bridge-ink">{room.title}</h1>
-        <p className="text-sm text-bridge-stone">
+        <p className="text-sm text-bridge-ink">
           {participantCount} / {room.maxParticipants ?? 2} ·{" "}
           <button
             type="button"
             onClick={() => void handleCopyCode()}
-            className="rounded-md border border-bridge-mist/70 bg-white/60 px-1.5 py-0.5 font-mono text-sm text-bridge-ink underline-offset-2 transition hover:bg-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-bridge-sage"
+            className="rounded-md border border-bridge-mist bg-white px-1.5 py-0.5 font-mono text-sm text-bridge-ink underline-offset-2 transition hover:bg-bridge-sand hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-bridge-sage"
             aria-label={`${t.room.header.copyAriaPrefix} ${room.inviteCode}`}
             title={t.room.header.copyTitle}
           >

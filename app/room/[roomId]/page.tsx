@@ -220,7 +220,7 @@ export default function RoomPage() {
 
   if (!sessionReady || loading || (session && !data?.room)) {
     return (
-      <WarmPageFrame>
+      <WarmPageFrame contentVeil="solid">
         <main className="flex min-h-screen flex-col items-center justify-center gap-3 px-4 py-20 text-center text-sm text-bridge-stone">
           <span
             className="inline-block h-9 w-9 animate-pulse rounded-full bg-bridge-peach/50 ring-4 ring-bridge-sage/15 motion-reduce:animate-none"
@@ -242,7 +242,7 @@ export default function RoomPage() {
      */
     const joinHref = rawId ? `/join?code=${encodeURIComponent(rawId)}` : "/join";
     return (
-      <WarmPageFrame>
+      <WarmPageFrame contentVeil="solid">
         <main className="min-h-screen px-4 py-16">
           <Card className="mx-auto max-w-lg border-bridge-mist shadow-lg">
             <CardContent className="space-y-4 p-6 text-sm leading-relaxed text-bridge-stone">
@@ -264,7 +264,7 @@ export default function RoomPage() {
 
   if (error) {
     return (
-      <WarmPageFrame>
+      <WarmPageFrame contentVeil="solid">
         <main className="min-h-screen px-4 py-20 text-center text-sm text-red-700">
           {error}
         </main>
@@ -318,7 +318,7 @@ export default function RoomPage() {
   }
 
   return (
-    <WarmPageFrame>
+    <WarmPageFrame contentVeil="solid">
     <main className="min-h-screen">
       <RoomJoinToasts toasts={joinToasts} onDismiss={dismissToast} />
       <PaywallModal

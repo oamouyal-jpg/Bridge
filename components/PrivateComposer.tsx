@@ -208,7 +208,7 @@ export function PrivateComposer({
     <Card className="border-bridge-mist bg-white">
       <CardContent className="space-y-4 p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sageMuted">
+          <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sage">
             {t.composer.header}
           </p>
           <span className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wide text-bridge-sage">
@@ -216,7 +216,7 @@ export function PrivateComposer({
             {t.composer.typeOrSpeak}
           </span>
         </div>
-        <p className="text-xs text-bridge-stone">{t.composer.blurb}</p>
+        <p className="text-sm leading-relaxed text-bridge-ink">{t.composer.blurb}</p>
 
         <TranslationModeSelector
           value={translationMode as TranslationMode}
@@ -294,17 +294,17 @@ export function PrivateComposer({
         {preview && (
           <div className="space-y-3 rounded-xl border border-bridge-sage/30 bg-bridge-mist p-4 text-sm text-bridge-ink">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sageMuted">
+              <p className="text-xs font-semibold uppercase tracking-wide text-bridge-sage">
                 {t.composer.previewHeader}
               </p>
-              <p className="mt-1 text-xs text-bridge-stone">{t.composer.previewBlurb}</p>
+              <p className="mt-1 text-sm leading-relaxed text-bridge-clay">{t.composer.previewBlurb}</p>
             </div>
 
             <div className="rounded-lg border border-bridge-mist bg-white p-3">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-bridge-stone">
                 {t.composer.yourDraftLabel}
               </p>
-              <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-bridge-ink/80">
+              <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-bridge-ink">
                 {preview.originalDraft}
               </p>
             </div>
@@ -329,7 +329,7 @@ export function PrivateComposer({
               )}
 
               {(preview.detectedIntent || typeof preview.escalationRisk === "number") && (
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-bridge-stone">
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-bridge-clay">
                   {preview.detectedIntent && (
                     <span>
                       <span className="font-medium text-bridge-ink">
@@ -398,12 +398,12 @@ export function PrivateComposer({
             >
               {busy ? t.composer.sending : t.composer.send}
             </Button>
-            <span className="text-[11px] text-bridge-stone">
+            <span className="text-[11px] font-medium text-bridge-clay">
               {t.composer.fairnessHelpers}
             </span>
             <button
               type="button"
-              className="text-[11px] text-bridge-sage underline"
+              className="text-[11px] font-medium text-bridge-ink underline underline-offset-2"
               disabled={busy || disabled || !draft.trim()}
               onClick={() => void quickRewrite("clearer")}
             >
@@ -411,7 +411,7 @@ export function PrivateComposer({
             </button>
             <button
               type="button"
-              className="text-[11px] text-bridge-sage underline"
+              className="text-[11px] font-medium text-bridge-ink underline underline-offset-2"
               disabled={busy || disabled || !draft.trim()}
               onClick={() => void quickRewrite("gentler")}
             >
@@ -419,7 +419,7 @@ export function PrivateComposer({
             </button>
             <button
               type="button"
-              className="text-[11px] text-bridge-sage underline"
+              className="text-[11px] font-medium text-bridge-ink underline underline-offset-2"
               disabled={busy || disabled || !draft.trim()}
               onClick={() => void quickRewrite("deeper")}
             >
