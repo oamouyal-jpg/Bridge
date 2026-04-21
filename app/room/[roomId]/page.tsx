@@ -231,6 +231,14 @@ export default function RoomPage() {
   }
 
   if (!session) {
+    /**
+     * Someone (usually the person who was sent the host's /room/<id> URL) is
+     * here without a local session. Send them to /join with the room id
+     * pre-filled — the join API accepts either invite code or room id so
+     * this "just works" whether the URL was a share link or a copy of the
+     * host's address bar.
+     */
+    const joinHref = rawId ? `/join?code=${encodeURIComponent(rawId)}` : "/join";
     return (
       <WarmPageFrame>
         <main className="min-h-screen px-4 py-16">
@@ -239,7 +247,7 @@ export default function RoomPage() {
               <p className="text-bridge-ink">{t.room.noSessionBody1}</p>
               <p>{t.room.noSessionBody2}</p>
               <Button asChild className="rounded-full">
-                <Link href="/join">{t.room.noSessionButton}</Link>
+                <Link href={joinHref}>{t.room.noSessionButton}</Link>
               </Button>
             </CardContent>
           </Card>

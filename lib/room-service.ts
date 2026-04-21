@@ -83,19 +83,31 @@ export function joinRoom(input: {
   inviteCode: string;
   displayName: string;
 }): { room: Room; participant: Participant; aggregate: RoomAggregate } {
-  const normalized = input.inviteCode.trim().toLowerCase();
-  const roomId = resolveRoomIdFromCode(normalized);
-  if (!roomId) {
-    console.warn(
-      `[bridge] join failed: inviteCode="${normalized}" not found in store`
-    );
-    throw new Error("Room not found.");
+  /**
+   * Users share whatever URL is in front of them, which is almost always the
+   * /room/<roomId> URL from the host's address bar. So accept either form
+   * (lowercased invite code OR case-sensitive room id) and resolve to a
+   * valid room. We try invite-code first because that's the intended
+   * identifier and it's cheaper (indexed lookup).
+   */
+  const raw = input.inviteCode.trim();
+  const lowered = raw.toLowerCase();
+
+  let roomId = resolveRoomIdFromCode(lowered);
+  let aggregate = roomId ? getOrCreateAggregate(roomId) : undefined;
+
+  if (!aggregate) {
+    // Try the input as a direct room id.
+    const maybe = getOrCreateAggregate(raw);
+    if (maybe) {
+      roomId = maybe.room.id;
+      aggregate = maybe;
+    }
   }
 
-  const aggregate = getOrCreateAggregate(roomId);
-  if (!aggregate) {
+  if (!roomId || !aggregate) {
     console.warn(
-      `[bridge] join failed: roomId=${roomId} resolved from code="${normalized}" but aggregate missing`
+      `[bridge] join failed: input="${raw}" matched neither invite code nor room id`
     );
     throw new Error("Room not found.");
   }
