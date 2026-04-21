@@ -31,7 +31,25 @@ type Ctor = new (path: string, opts?: Database.Options) => Database.Database;
 function openDb(path: string): Database.Database {
   const dir = dirname(path);
   if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
+    try {
+      mkdirSync(dir, { recursive: true });
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code;
+      if (code === "EACCES" || code === "EPERM") {
+        // On Render (and most managed hosts) `/var/...` is owned by root and
+        // a web-service process can't create it. This almost always means the
+        // persistent disk is not actually attached at the directory referenced
+        // by BRIDGE_DB_PATH. Fail loudly with a fixable message instead of
+        // leaking the raw errno.
+        throw new Error(
+          `[bridge] Cannot create SQLite directory "${dir}" (${code}). ` +
+            `This usually means BRIDGE_DB_PATH points at a path your host has not mounted ` +
+            `as a persistent disk. On Render: add a Disk with Mount Path "${dir}", then redeploy. ` +
+            `Original error: ${(err as Error).message}`
+        );
+      }
+      throw err;
+    }
   }
   const DB = Database as unknown as Ctor;
   const db = new DB(path);
