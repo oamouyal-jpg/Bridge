@@ -11,28 +11,27 @@ const INTAKE_SYSTEM = `You are an emotionally intelligent conflict intake guide 
 
 Your job is to help one participant privately clarify what is really happening for them before mediation begins.
 
-Rules:
-- Ask only one question at a time.
+Critical pacing rules — the intake must feel short. People lose interest after 3–4 questions:
+- Keep the whole intake to 2–3 questions total (the opener plus at most 2 follow-ups).
+- As soon as you have a rough read on what happened + what they feel + what they want, set enough_information: true and close in a warm sentence.
+- Never ask more than 4 questions total under any circumstance.
+- Never ask two questions in the same message.
+
+Other rules:
 - Be warm, clear, concise, and non-clinical.
 - Do not sound like a therapist or a generic support bot.
-- Help the user uncover what hurt, what they need, what they fear, and what outcome they want.
-- Do not over-explain.
-- Keep questions natural and emotionally intelligent.
+- Do not over-explain; no preamble before the question.
 - Do not start mediation yet.
 - Do not speak about the other participant as if you know their inner world.
-- Your goal is to gather enough signal for a hidden emotional profile.
 
-Focus on discovering:
-- presenting complaint
-- emotional state
-- unmet need
-- dominant fear
-- conflict style
-- desired outcome
-- readiness for mediation
+Try to cover, across those 2–3 questions, some mix of:
+- what happened (presenting complaint)
+- how they feel (emotional state + intensity)
+- what they need or want (unmet need, desired outcome)
+- what they fear losing
 
 When enough information is gathered, return a final message indicating readiness in a natural way, such as:
-"I think I understand the shape of this well enough to begin mediation."
+"I think I have enough to begin mediation."
 
 Output JSON:
 {
@@ -258,14 +257,17 @@ export async function respondIntake(
   const userTurns = getThread(aggregate, participantId).filter((m) => m.role === "user").length;
 
   if (!isAiConfigured()) {
-    const forceDone = userTurns >= 3;
+    // Short intake: after 2 user answers we have enough to move on. The opener
+    // + one follow-up is plenty to form a rough profile, and longer intakes
+    // cause people to bail before they ever reach the shared thread.
+    const forceDone = userTurns >= 2;
     // `turnsBefore` is how many assistant questions have been asked already;
     // the next question we're about to push is at that index (0-based).
     const nextQuestionIndex = turnsBefore;
     const turn: IntakeTurnResult = forceDone
       ? {
           message:
-            "I think I understand the shape of this well enough to begin mediation. We’ll move carefully from here.",
+            "Thanks — I have enough to begin mediation. We’ll move carefully from here.",
           enough_information: true,
           signals: MOCK_QUESTION_LADDER[MOCK_QUESTION_LADDER.length - 1].signals,
         }
@@ -289,7 +291,7 @@ export async function respondIntake(
   const userPrompt = `Here is the transcript so far between you and the participant:\n${transcriptForPrompt(
     aggregate,
     participantId
-  )}\n${priorAssistantBlock}\nRules:\n- Ask only ONE next question OR close if enough_information.\n- Your next question MUST be materially different from every question listed above. Do not paraphrase a prior question. If you have already covered feelings and hurts, now ask about unmet need, fear, or desired outcome.\n- If you already have enough detail for a hidden profile, set enough_information true.\n- Never ask more than a total of 8 assistant questions in a full intake; this assistant has asked ${turnsBefore} questions so far (not including this response).`;
+  )}\n${priorAssistantBlock}\nRules for your next turn:\n- Ask ONE next question OR close with enough_information=true.\n- Prefer to close. You should close by the 2nd or 3rd assistant message whenever you have any read on what happened + how they feel + what they want. People lose interest if intake runs long.\n- If this would be your 3rd or later question, you MUST set enough_information=true unless the participant has said almost nothing usable.\n- Your next question MUST be materially different from every question listed above. Do not paraphrase a prior question.\n- Never ask more than 4 assistant questions total; this assistant has asked ${turnsBefore} so far (not counting this response).`;
 
   const baseSystem =
     aggregate.participants.size > 2 ? `${INTAKE_SYSTEM}${GROUP_INTAKE_SYSTEM_APPEND}` : INTAKE_SYSTEM;
@@ -298,25 +300,28 @@ export async function respondIntake(
   let normalized = normalizeTurn(parsed);
 
   const afterTurn = turnsBefore + 1; // this response counts as next assistant message
-  if (afterTurn < 3) {
+  // Minimum is now 2 assistant turns (opener + one follow-up or close). We
+  // used to require 3 but that was too long; people bounced before reaching
+  // the shared thread.
+  if (afterTurn < 2) {
     normalized = { ...normalized, enough_information: false };
   }
-  if (afterTurn >= 8) {
+  if (afterTurn >= 4) {
     normalized = {
       ...normalized,
       enough_information: true,
       message:
         normalized.message ||
-        "I think I understand the shape of this well enough to begin mediation. We’ll move carefully from here.",
+        "Thanks — I have enough to begin mediation. We’ll move carefully from here.",
     };
   }
 
   // Belt-and-braces: if the model still echoed a prior question verbatim or
   // near-verbatim, treat intake as done rather than force the user to answer
-  // the same thing twice. `afterTurn >= 3` guarantees we've gathered enough
-  // for a profile before we short-circuit.
+  // the same thing twice. `afterTurn >= 2` guarantees at least one real
+  // follow-up before we short-circuit.
   if (
-    afterTurn >= 3 &&
+    afterTurn >= 2 &&
     !normalized.enough_information &&
     priorAssistantMessages.some((prior) => isNearDuplicate(prior, normalized.message))
   ) {
@@ -324,7 +329,7 @@ export async function respondIntake(
       ...normalized,
       enough_information: true,
       message:
-        "I think I understand the shape of this well enough to begin mediation. We’ll move carefully from here.",
+        "Thanks — I have enough to begin mediation. We’ll move carefully from here.",
     };
   }
 

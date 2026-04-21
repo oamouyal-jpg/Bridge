@@ -6,6 +6,7 @@ export const he: BridgeMessages = {
     join: "הצטרפות",
     startRoom: "פתיחת חדר",
     getApp: "הורדת האפליקציה",
+    share: "שיתוף",
   },
   hero: {
     badge: "מתווך AI לשיחות קשות",
@@ -194,10 +195,17 @@ export const he: BridgeMessages = {
         "לכל אחד מכם יש שיחה סמויה עם Bridge כאן. הדלת לגישור יחד נפתחת כאשר ",
       readyBodyEmphasis: "כולם",
       readyBody2: " סיימו את השלב הזה — בלי לחץ, בלי הפתעות.",
-      inviteTitle: "הזמנה כשאת/ה מוכן/ה",
+      inviteTitle: "שלח/י את ההזמנה כדי שהצד השני יוכל להצטרף",
+      shareNowBody:
+        "בלי הקוד הזה אי אפשר להיכנס לחדר. שלחו אותו בוואטסאפ, במייל או העתיקו את הקישור — בערוץ שהכי סביר שיענו בו.",
       codeLabel: "קוד:",
       joinedCountSuffix: "· {n}/{cap} הצטרפו",
       copyCode: "העתקת קוד",
+      completeHeading: "האינטייק הפרטי שלך הסתיים.",
+      completeBody:
+        "ל־Bridge יש את כל מה שצריך מהצד שלך. אפשר לסגור את הדף ולחזור מאוחר יותר — התשובות שלך נשמרו.",
+      completeWaiting:
+        "אנחנו ממתינים שהצד השני יסיים את השאלות הפרטיות. החדר המשותף ייפתח אוטומטית ברגע שכולם מוכנים.",
     },
     readyForMediation: {
       lineBothSides:

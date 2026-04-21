@@ -4,7 +4,24 @@ import { Mic, MicOff } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { useVoiceDictation } from "@/hooks/useVoiceDictation";
+import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
+import type { Locale } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils";
+
+/**
+ * Map Bridge UI locales to a sensible BCP-47 tag for the browser's
+ * SpeechRecognition engine. Without this the recognizer defaults to en-US
+ * and prints phonetic-English garbage when the user speaks another language.
+ */
+const LOCALE_TO_BCP47: Record<Locale, string> = {
+  en: "en-US",
+  fr: "fr-FR",
+  es: "es-ES",
+  he: "he-IL",
+  ar: "ar-SA",
+  ja: "ja-JP",
+  zh: "zh-CN",
+};
 
 type Props = {
   value: string;
@@ -31,8 +48,10 @@ export const VoiceInputControl = forwardRef<VoiceInputHandle, Props>(function Vo
   { value, onChange, disabled, className, compact },
   ref
 ) {
+  const { locale } = useBridgeLocale();
   const { supported, listening, voiceError, start, stop, setVoiceError } = useVoiceDictation({
     onText: onChange,
+    lang: LOCALE_TO_BCP47[locale] ?? "en-US",
   });
 
   useImperativeHandle(ref, () => ({ stopAndReset: stop }), [stop]);

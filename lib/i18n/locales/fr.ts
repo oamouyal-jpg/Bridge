@@ -6,6 +6,7 @@ export const fr: BridgeMessages = {
     join: "Rejoindre",
     startRoom: "Ouvrir une salle",
     getApp: "Obtenir l’app",
+    share: "Partager",
   },
   hero: {
     badge: "Médiateur IA pour les conversations difficiles",
@@ -195,10 +196,17 @@ export const fr: BridgeMessages = {
         "Chacun·e a ici un fil caché avec Bridge. La porte vers la médiation s'ouvre lorsque ",
       readyBodyEmphasis: "tout le monde",
       readyBody2: " a terminé cette étape — sans se presser, sans surprise.",
-      inviteTitle: "Inviter quand vous êtes prêt·e",
+      inviteTitle: "Partagez l'invitation pour qu'iel puisse rejoindre",
+      shareNowBody:
+        "Sans ce code, personne ne peut entrer dans cette salle. Envoyez-le par WhatsApp, e-mail, ou copiez le lien — selon le canal où iel vous répondra le plus vite.",
       codeLabel: "Code :",
       joinedCountSuffix: "· {n}/{cap} ont rejoint",
       copyCode: "Copier le code",
+      completeHeading: "Votre accueil privé est terminé.",
+      completeBody:
+        "Bridge a tout ce qu'il lui faut de votre côté. Vous pouvez fermer cet onglet et revenir plus tard — vos réponses sont enregistrées.",
+      completeWaiting:
+        "Nous attendons que l'autre personne termine ses questions privées. La salle partagée s'ouvrira automatiquement une fois tout le monde prêt.",
     },
     readyForMediation: {
       lineBothSides:

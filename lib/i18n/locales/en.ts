@@ -6,6 +6,7 @@ export const en: BridgeMessages = {
     join: "Join",
     startRoom: "Start a room",
     getApp: "Get the app",
+    share: "Share",
   },
   hero: {
     badge: "AI mediator for hard conversations",
@@ -191,10 +192,17 @@ export const en: BridgeMessages = {
       readyBody1: "Each of you has a hidden thread with Bridge here. The door to mediation together opens when ",
       readyBodyEmphasis: "everyone",
       readyBody2: " has finished this step — no rushing, no surprises.",
-      inviteTitle: "Invite when you're ready",
+      inviteTitle: "Share the invite so they can join",
+      shareNowBody:
+        "They can't enter this room without this code. Send it through WhatsApp, email, or copy the link — whichever they're most likely to answer.",
       codeLabel: "Code:",
       joinedCountSuffix: "· {n}/{cap} joined",
       copyCode: "Copy code",
+      completeHeading: "Your private intake is complete.",
+      completeBody:
+        "Bridge has everything it needs from your side. You can close this tab and come back later — your answers are saved.",
+      completeWaiting:
+        "We're waiting for the other person to finish their private questions. The shared room opens automatically once everyone is ready.",
     },
     readyForMediation: {
       lineBothSides:

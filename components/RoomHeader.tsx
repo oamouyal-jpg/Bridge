@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ShareAppButton } from "@/components/ShareAppButton";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 import { copyToClipboard } from "@/lib/clipboard";
@@ -72,6 +73,7 @@ export function RoomHeader({
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
+        <ShareAppButton />
         <LanguageSwitcher />
         <Badge variant="secondary">{statusLabel[room.status]}</Badge>
         <Button variant="secondary" asChild className="rounded-full">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FeatureCards } from "@/components/FeatureCards";
 import { LandingHero } from "@/components/LandingHero";
 import { ShareAppLink } from "@/components/ShareAppLink";
+import { ShareAppButton } from "@/components/ShareAppButton";
 import { useBridgeLocale } from "@/components/i18n/BridgeLocaleProvider";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
@@ -19,6 +20,7 @@ function HomeHeader() {
           </span>
         </Link>
         <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+          <ShareAppButton />
           <LanguageSwitcher />
           <nav className="flex items-center gap-2">
             <Link href="/download" className="bridge-btn-ghost text-sm">

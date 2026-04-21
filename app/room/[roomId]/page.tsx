@@ -364,36 +364,32 @@ export default function RoomPage() {
               others={data.others}
             />
           )}
-          <IntakeChat
-            roomId={rawId}
-            participantId={myId}
-            initialMessages={data.myIntake ?? []}
-            onUpdate={refresh}
-          />
           {participants.length < joinCap && (
-            <Card className="mt-8 border-bridge-mist bg-white">
+            <Card className="mb-6 border-bridge-sage/40 bg-gradient-to-br from-white via-bridge-honey/50 to-bridge-peach/20 shadow-sm">
               <CardContent className="space-y-4 p-6">
-                <p className="text-sm font-medium text-bridge-ink">{t.room.intake.inviteTitle}</p>
-                <p className="text-sm text-bridge-stone">
-                  {t.room.intake.codeLabel}{" "}
-                  <span className="font-mono text-lg text-bridge-ink">{room.inviteCode}</span>
+                <div>
+                  <p className="font-display text-lg text-bridge-ink">
+                    {t.room.intake.inviteTitle}
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-bridge-stone">
+                    {t.room.intake.shareNowBody}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-bridge-mist bg-white/80 px-4 py-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-bridge-sageMuted">
+                    {t.room.intake.codeLabel}
+                  </p>
+                  <p className="mt-1 font-mono text-2xl tracking-wide text-bridge-ink">
+                    {room.inviteCode}
+                  </p>
                   {joinCap > 2 && (
-                    <span className="ms-2 text-bridge-stone">
-                      {" "}
+                    <p className="mt-1 text-xs text-bridge-stone">
                       {t.room.intake.joinedCountSuffix
                         .replace("{n}", String(participants.length))
                         .replace("{cap}", String(joinCap))}
-                    </span>
+                    </p>
                   )}
-                </p>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="rounded-full"
-                  onClick={() => navigator.clipboard.writeText(room.inviteCode)}
-                >
-                  {t.room.intake.copyCode}
-                </Button>
+                </div>
                 <ShareInviteLinks
                   inviteCode={room.inviteCode}
                   roomTitle={room.title}
@@ -402,6 +398,28 @@ export default function RoomPage() {
                 />
               </CardContent>
             </Card>
+          )}
+          {data.me?.intakeCompleted ? (
+            <Card className="border-bridge-sage/30 bg-gradient-to-br from-bridge-honey/60 to-white">
+              <CardContent className="space-y-3 p-6 text-sm leading-relaxed text-bridge-stone">
+                <p className="font-display text-lg text-bridge-ink">
+                  {t.room.intake.completeHeading}
+                </p>
+                <p>{t.room.intake.completeBody}</p>
+                {(data.others?.some((o) => !o.intakeCompleted) ?? false) && (
+                  <p className="rounded-xl bg-bridge-sand/60 p-3 text-bridge-ink">
+                    {t.room.intake.completeWaiting}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <IntakeChat
+              roomId={rawId}
+              participantId={myId}
+              initialMessages={data.myIntake ?? []}
+              onUpdate={refresh}
+            />
           )}
         </div>
       )}

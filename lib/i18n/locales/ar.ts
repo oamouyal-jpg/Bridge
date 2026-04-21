@@ -7,6 +7,7 @@ export const ar: BridgeMessages = {
     join: "انضمام",
     startRoom: "ابدأ غرفة",
     getApp: "احصل على التطبيق",
+    share: "مشاركة",
   },
   hero: {
     badge: "مكان أنعم لحديث صعب",

@@ -50,8 +50,8 @@ export function AppPreviewMock({ compact = false }: AppPreviewMockProps) {
         <div
           className={`grid grid-cols-1 divide-y divide-bridge-mist md:grid-cols-2 md:divide-x md:divide-y-0 ${
             compact
-              ? "max-h-[min(300px,48vh)]"
-              : "max-h-[min(520px,70vh)]"
+              ? "h-[min(300px,48vh)]"
+              : "h-[min(520px,70vh)]"
           }`}
         >
           {/* Private intake column */}

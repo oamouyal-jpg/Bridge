@@ -1,6 +1,6 @@
 /** All user-facing UI copy keyed for translation. */
 export type BridgeMessages = {
-  nav: { tagline: string; join: string; startRoom: string; getApp: string };
+  nav: { tagline: string; join: string; startRoom: string; getApp: string; share: string };
   hero: {
     badge: string;
     h1a: string;
@@ -148,10 +148,15 @@ export type BridgeMessages = {
       readyBodyEmphasis: string;
       readyBody2: string;
       inviteTitle: string;
+      /** Short directive sentence that tells the creator to share the code now. */
+      shareNowBody: string;
       codeLabel: string;
       /** Use `{n}` and `{cap}` placeholders. */
       joinedCountSuffix: string;
       copyCode: string;
+      completeHeading: string;
+      completeBody: string;
+      completeWaiting: string;
     };
     readyForMediation: {
       lineBothSides: string;
