@@ -8,6 +8,7 @@ export const zh: BridgeMessages = {
     startRoom: "创建房间",
     getApp: "获取应用",
     share: "分享",
+    demo: "演示",
   },
   hero: {
     badge: "艰难对话的温柔空间",

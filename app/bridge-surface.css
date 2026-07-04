@@ -16,6 +16,7 @@
 
 .bridge-surface {
   min-height: 100vh;
+  min-height: 100svh;
   position: relative;
   /* Solid base first — gradients are subtle tint only */
   background-color: var(--bridge-cream);
@@ -35,6 +36,7 @@
 /** Home over photography — no paint, room stays visible */
 .bridge-home-root {
   min-height: 100vh;
+  min-height: 100svh;
   position: relative;
   background: transparent;
   color: var(--bridge-ink);
@@ -73,6 +75,7 @@
   border-bottom: 1px solid color-mix(in srgb, var(--bridge-mist) 75%, transparent);
   background: color-mix(in srgb, var(--bridge-cream) 88%, white);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 1px 0 rgba(47, 40, 35, 0.04);
 }
 
@@ -136,4 +139,30 @@
 }
 .bridge-btn-ghost:hover {
   background: var(--bridge-sand);
+}
+
+/**
+ * Mobile Safari: URL bar resizes the dynamic viewport; `backdrop-filter` on large
+ * surfaces forces expensive repaints every frame, so body copy and glass panels
+ * appear to “shimmer” with the photo. Use stable `svh` heights (above) and drop
+ * blur on narrow viewports in favour of nearly-opaque fills.
+ */
+@media (max-width: 767px) {
+  .bridge-inroom-copy {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(255, 251, 247, 0.96);
+  }
+
+  .bridge-sticky-header {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: color-mix(in srgb, var(--bridge-cream) 96%, white);
+  }
+
+  .bridge-nav-glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(255, 251, 247, 0.92);
+  }
 }

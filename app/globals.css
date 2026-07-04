@@ -10,10 +10,13 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* Reduce horizontal rubber-band affecting fixed layers on iOS */
+  overflow-x: hidden;
 }
 
 body {
-  @apply bg-bridge-cream text-bridge-ink font-sans min-h-screen antialiased;
+  /* `svh` keeps min-height stable when iOS toolbars show/hide (avoids text reflow jitter). */
+  @apply bg-bridge-cream text-bridge-ink font-sans min-h-svh antialiased;
 }
 
 ::selection {

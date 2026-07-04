@@ -1,6 +1,13 @@
 /** All user-facing UI copy keyed for translation. */
 export type BridgeMessages = {
-  nav: { tagline: string; join: string; startRoom: string; getApp: string; share: string };
+  nav: {
+    tagline: string;
+    join: string;
+    startRoom: string;
+    getApp: string;
+    share: string;
+    demo: string;
+  };
   hero: {
     badge: string;
     h1a: string;

@@ -29,6 +29,9 @@ function HomeHeader() {
             <Link href="/join" className="bridge-btn-ghost text-sm">
               {t.nav.join}
             </Link>
+            <Link href="/demo" className="bridge-btn-ghost text-sm">
+              {t.nav.demo}
+            </Link>
             <Link href="/create" className="bridge-btn-primary text-sm">
               {t.nav.startRoom}
             </Link>
@@ -42,7 +45,7 @@ function HomeHeader() {
 function HomeFooter() {
   const { t } = useBridgeLocale();
   return (
-    <footer className="border-t border-white/30 bg-white/15 px-4 py-12 backdrop-blur-xl sm:px-5">
+    <footer className="border-t border-white/30 bg-white/15 px-4 py-12 backdrop-blur-xl max-md:bg-white/88 max-md:backdrop-blur-none sm:px-5">
       <div className="mx-auto max-w-6xl px-4 py-14">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <div>

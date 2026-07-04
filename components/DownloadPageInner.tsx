@@ -13,7 +13,7 @@ export function DownloadPageInner() {
     process.env.NEXT_PUBLIC_ANDROID_APP_URL?.trim();
 
   return (
-    <main className="min-h-screen bg-bridge-cream px-4 py-16 text-bridge-ink">
+    <main className="min-h-svh bg-bridge-cream px-4 py-16 text-bridge-ink">
       <div className="mx-auto max-w-md rounded-2xl border border-bridge-mist bg-white p-8 shadow-md">
         <div className="mb-4 flex justify-end">
           <LanguageSwitcher />

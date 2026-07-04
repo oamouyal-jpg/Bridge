@@ -23,7 +23,7 @@ export function AppPreviewMock({ compact = false }: AppPreviewMockProps) {
     <div className="relative">
       {!compact && (
         <div
-          className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-bridge-sage/15 via-transparent to-bridge-blush/20 blur-2xl"
+          className="pointer-events-none absolute -inset-4 hidden rounded-[2rem] bg-gradient-to-br from-bridge-sage/15 via-transparent to-bridge-blush/20 blur-2xl sm:block"
           aria-hidden
         />
       )}

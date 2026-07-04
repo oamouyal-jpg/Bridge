@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { BackHomeLink } from "@/components/BackHomeLink";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -74,12 +74,10 @@ export default function CreateRoomPage() {
 
   return (
     <WarmPageFrame>
-      <main className="min-h-screen px-4 py-12 sm:py-20">
+      <main className="min-h-svh px-4 py-12 sm:py-20">
         <div className="mx-auto max-w-lg">
           <div className="flex items-center justify-between">
-            <Link href="/" className="text-sm text-bridge-stone transition-colors hover:text-bridge-ink">
-              {t.common.backHome}
-            </Link>
+            <BackHomeLink label={t.common.backHome} />
             <LanguageSwitcher />
           </div>
           <Card className="mt-6 border-bridge-mist shadow-[0_20px_60px_-24px_rgba(47,40,35,0.1)]">

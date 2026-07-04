@@ -75,7 +75,7 @@ export function RoomJoinToasts({
         return (
           <div
             key={toast.id}
-            className="pointer-events-auto w-full max-w-sm animate-[bridge-toast-in_260ms_ease-out] rounded-2xl border border-bridge-sage/40 bg-white/95 p-4 shadow-xl ring-1 ring-bridge-sage/10 backdrop-blur-sm"
+            className="pointer-events-auto w-full max-w-sm animate-[bridge-toast-in_260ms_ease-out] rounded-2xl border border-bridge-sage/40 bg-white/95 p-4 shadow-xl ring-1 ring-bridge-sage/10 backdrop-blur-sm max-md:backdrop-blur-none"
           >
             <div className="flex items-start gap-3">
               <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-bridge-sage/15 text-bridge-sage">

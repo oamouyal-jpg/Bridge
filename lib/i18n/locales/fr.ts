@@ -7,6 +7,7 @@ export const fr: BridgeMessages = {
     startRoom: "Ouvrir une salle",
     getApp: "Obtenir l’app",
     share: "Partager",
+    demo: "Démo",
   },
   hero: {
     badge: "Médiateur IA pour les conversations difficiles",

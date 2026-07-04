@@ -8,6 +8,7 @@ export const ja: BridgeMessages = {
     startRoom: "ルームを始める",
     getApp: "アプリを入手",
     share: "共有",
+    demo: "デモ",
   },
   hero: {
     badge: "難しい話のための、やわらかい場所",

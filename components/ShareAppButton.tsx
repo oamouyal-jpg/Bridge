@@ -113,7 +113,7 @@ export function ShareAppButton({ className }: { className?: string }) {
         type="button"
         onClick={() => void handleTriggerClick()}
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/35 px-3 py-1.5 text-xs font-medium text-bridge-ink shadow-sm backdrop-blur-sm transition",
+          "inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/35 px-3 py-1.5 text-xs font-medium text-bridge-ink shadow-sm backdrop-blur-sm transition max-md:bg-white/92 max-md:backdrop-blur-none",
           "hover:bg-white/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bridge-sage"
         )}
         aria-haspopup="menu"
@@ -128,7 +128,7 @@ export function ShareAppButton({ className }: { className?: string }) {
         <div
           role="menu"
           className={cn(
-            "absolute end-0 top-full z-50 mt-2 min-w-[13rem] rounded-xl border border-white/60 bg-white/95 p-1.5 shadow-lg backdrop-blur-md",
+            "absolute end-0 top-full z-50 mt-2 min-w-[13rem] rounded-xl border border-white/60 bg-white/95 p-1.5 shadow-lg backdrop-blur-md max-md:backdrop-blur-none",
             "text-sm text-bridge-ink"
           )}
         >

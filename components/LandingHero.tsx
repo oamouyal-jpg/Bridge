@@ -15,7 +15,7 @@ export function LandingHero() {
         <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
           <div className="bridge-inroom-copy space-y-8 px-6 py-9 sm:px-8 sm:py-10 lg:col-span-6 xl:col-span-5">
             <header className="text-center lg:text-left">
-              <p className="inline-flex items-center gap-2 rounded-full border border-white/50 bg-white/25 px-4 py-1.5 text-sm font-medium text-bridge-clay backdrop-blur-sm">
+              <p className="inline-flex items-center gap-2 rounded-full border border-white/50 bg-white/25 px-4 py-1.5 text-sm font-medium text-bridge-clay backdrop-blur-sm max-md:bg-white/92 max-md:backdrop-blur-none">
                 <span className="h-2 w-2 shrink-0 rounded-full bg-bridge-sage ring-2 ring-bridge-sage/25" aria-hidden />
                 {t.hero.badge}
               </p>
@@ -56,7 +56,7 @@ export function LandingHero() {
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-white/45 bg-white/25 px-3 py-1.5 text-[11px] font-semibold tracking-wide text-bridge-clay backdrop-blur-sm"
+                    className="rounded-full border border-white/45 bg-white/25 px-3 py-1.5 text-[11px] font-semibold tracking-wide text-bridge-clay backdrop-blur-sm max-md:bg-white/92 max-md:backdrop-blur-none"
                   >
                     {tag}
                   </span>
@@ -71,7 +71,7 @@ export function LandingHero() {
                   asChild
                   size="lg"
                   variant="secondary"
-                  className="rounded-full border-white/50 bg-white/50 px-8 backdrop-blur-sm hover:bg-white/70"
+                  className="rounded-full border-white/50 bg-white/50 px-8 backdrop-blur-sm hover:bg-white/70 max-md:bg-white/92 max-md:backdrop-blur-none max-md:hover:bg-white/95"
                 >
                   <Link href="/join">{t.hero.ctaJoin}</Link>
                 </Button>
@@ -86,7 +86,7 @@ export function LandingHero() {
             <p className="mb-2 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-bridge-ink/70 lg:text-start">
               {t.hero.demoCaption}
             </p>
-            <div className="rounded-2xl border border-white/65 bg-white/75 p-2 shadow-lg backdrop-blur-xl sm:p-2.5">
+            <div className="rounded-2xl border border-white/65 bg-white/75 p-2 shadow-lg backdrop-blur-xl max-md:bg-white/96 max-md:backdrop-blur-none sm:p-2.5">
               <AppPreviewMock compact />
             </div>
           </aside>

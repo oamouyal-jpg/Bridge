@@ -80,7 +80,7 @@ export function PaywallModal({
   if (!open || !product) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-bridge-ink/40 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-bridge-ink/40 p-4 backdrop-blur-sm max-md:bg-bridge-ink/55 max-md:backdrop-blur-none">
       <Card className="relative max-w-md border-bridge-mist shadow-xl">
         <CardHeader>
           <CardTitle className="font-display text-xl">{TITLES[product]}</CardTitle>

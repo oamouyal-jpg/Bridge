@@ -28,7 +28,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         value={locale}
         onChange={(e) => setLocale(e.target.value as Locale)}
         className={cn(
-          "max-w-[10.5rem] cursor-pointer rounded-full border border-white/50 bg-white/35 py-1.5 pe-2 ps-3 text-xs font-medium text-bridge-ink shadow-sm backdrop-blur-sm",
+          "max-w-[10.5rem] cursor-pointer rounded-full border border-white/50 bg-white/35 py-1.5 pe-2 ps-3 text-xs font-medium text-bridge-ink shadow-sm backdrop-blur-sm max-md:bg-white/92 max-md:backdrop-blur-none",
           "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bridge-sage"
         )}
       >

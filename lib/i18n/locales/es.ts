@@ -8,6 +8,7 @@ export const es: BridgeMessages = {
     startRoom: "Abrir una sala",
     getApp: "Obtener la app",
     share: "Compartir",
+    demo: "Demo",
   },
   hero: {
     badge: "Un lugar más suave para una conversación difícil",
